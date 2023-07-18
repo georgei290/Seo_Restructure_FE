@@ -52,25 +52,6 @@ const DataContent = (props: any) => {
 						information that Domranker Keyword provides.
 					</SubTitle>
 
-					<InputHold>
-						<Main>
-							<InputText>Select Category</InputText>
-							<Select
-								onChange={(e: any) => {
-									setType(e.target.value);
-								}}>
-								<option disabled value=''>
-									Select category
-								</option>
-								<option value='ecommerce'>Ecommerce</option>
-								<option value='news'>News</option>
-								<option value='blogs'>Blogs</option>
-								<option value='message-boards'>Message-boards</option>
-								<option value='organization'>Organization</option>
-							</Select>
-						</Main>
-					</InputHold>
-
 					<Main>
 						<InputText>Search Keyword</InputText>
 						<Input2>

@@ -1,9 +1,8 @@
 import { useRoutes } from "react-router-dom";
-import PrivateRoute from "../../utils/PrivateRoute";
+// import PrivateRoute from "../../utils/PrivateRoute";
 import {
 	BackLinkChecker,
 	BusinessData,
-	ContentAnalyzer,
 	Keywords,
 	OnPageData,
 	SeoChecker,
@@ -12,6 +11,15 @@ import {
 	KewWordTable,
 	AiTools,
 	SiteFlow,
+	MainContent,
+	ContentDensity,
+	ContentMetatags,
+	ContentTitle,
+	ContentLinks,
+	AiRewritting,
+	AiReadability,
+	AiWorldCounts,
+	AiWebsiteAge,
 } from "./Bundled";
 
 const DashBoardRoutes = () => {
@@ -40,7 +48,31 @@ const DashBoardRoutes = () => {
 		},
 		{
 			path: "/contentanalyzer",
-			element: <ContentAnalyzer />,
+			children: [
+				{
+					index: true,
+					element: <MainContent />,
+				},
+
+				{
+					path: "density",
+					element: <ContentDensity />,
+				},
+
+				{
+					path: "extract-metatags",
+					element: <ContentMetatags />,
+				},
+
+				{
+					path: "title-tags",
+					element: <ContentTitle />,
+				},
+				{
+					path: "links",
+					element: <ContentLinks />,
+				},
+			],
 		},
 
 		{
@@ -50,7 +82,31 @@ const DashBoardRoutes = () => {
 
 		{
 			path: "/aitools",
-			element: <AiTools />,
+			children: [
+				{
+					index: true,
+					element: <AiTools />,
+				},
+				{
+					path: "text-rewritting",
+					element: <AiRewritting />,
+				},
+
+				{
+					path: "readability-score",
+					element: <AiReadability />,
+				},
+
+				{
+					path: "word-count",
+					element: <AiWorldCounts />,
+				},
+
+				{
+					path: "website-age",
+					element: <AiWebsiteAge />,
+				},
+			],
 		},
 
 		{

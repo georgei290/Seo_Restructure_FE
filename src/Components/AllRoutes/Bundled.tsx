@@ -46,4 +46,31 @@ export const SeoSearchEngine = loaded(
 );
 
 export const AiTools = loaded(() => import("../DashBoard/AiTools/AiTools"));
+export const AiRewritting = loaded(
+	() => import("../DashBoard/AiTools/AiRewriting"),
+);
+export const AiReadability = loaded(
+	() => import("../DashBoard/AiTools/AiReadability"),
+);
+export const AiWorldCounts = loaded(
+	() => import("../DashBoard/AiTools/AiWorldCounts"),
+);
+export const AiWebsiteAge = loaded(
+	() => import("../DashBoard/AiTools/AiWebsiteAge"),
+);
 export const SiteFlow = loaded(() => import("../DashBoard/SiteFlow/SiteFlow"));
+export const MainContent = loaded(
+	() => import("../DashBoard/ContentAnalyzer/MainContent"),
+);
+export const ContentDensity = loaded(
+	() => import("../DashBoard/ContentAnalyzer/ContentDensity"),
+);
+export const ContentMetatags = loaded(
+	() => import("../DashBoard/ContentAnalyzer/ContentMetatags"),
+);
+export const ContentTitle = loaded(
+	() => import("../DashBoard/ContentAnalyzer/ContentTilte"),
+);
+export const ContentLinks = loaded(
+	() => import("../DashBoard/ContentAnalyzer/ContentLinks"),
+);
