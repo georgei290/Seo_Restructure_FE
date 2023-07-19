@@ -15,7 +15,16 @@ import {
 	MobileSupport,
 	SpeedTest,
 	Headers,
-	PWA
+	PWA,
+	AiRewritting,
+	AiReadability,
+	AiWorldCounts,
+	AiWebsiteAge,
+	MainContent,
+	ContentDensity,
+	ContentMetatags,
+	ContentTitle,
+	ContentLinks,
 } from "./Bundled";
 
 const DashBoardRoutes = () => {
@@ -44,7 +53,32 @@ const DashBoardRoutes = () => {
 		},
 		{
 			path: "/contentanalyzer",
-			element: <ContentAnalyzer />,
+			children: [
+				{
+					index: true,
+					element: <MainContent />,
+				},
+
+				{
+					path: "density",
+					element: <ContentDensity />,
+				},
+
+				{
+					path: "extract-metatags",
+					element: <ContentMetatags />,
+				},
+
+				{
+					path: "title-tags",
+					element: <ContentTitle />,
+				},
+
+				{
+					path: "links",
+					element: <ContentLinks />,
+				},
+			],
 		},
 
 		{
@@ -56,26 +90,51 @@ const DashBoardRoutes = () => {
 				},
 				{
 					path: "mobile-support",
-					element: <MobileSupport/>
+					element: <MobileSupport />,
 				},
 				{
 					path: "speed-test",
-					element: <SpeedTest/>
+					element: <SpeedTest />,
 				},
 				{
 					path: "headers",
-					element: <Headers/>
+					element: <Headers />,
 				},
 				{
 					path: "pwa",
-					element: <PWA/>
+					element: <PWA />,
 				},
-			]
+			],
 		},
 
 		{
 			path: "/aitools",
-			element: <AiTools />,
+			children: [
+				{
+					index: true,
+					element: <AiTools />,
+				},
+
+				{
+					path: "text-rewritting",
+					element: <AiRewritting />,
+				},
+
+				{
+					path: "readability-score",
+					element: <AiReadability />,
+				},
+
+				{
+					path: "word-count",
+					element: <AiWorldCounts />,
+				},
+
+				{
+					path: "website-age",
+					element: <AiWebsiteAge />,
+				},
+			],
 		},
 
 		{
