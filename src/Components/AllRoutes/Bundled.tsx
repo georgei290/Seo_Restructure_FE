@@ -59,6 +59,12 @@ export const AiWebsiteAge = loaded(
 	() => import("../DashBoard/AiTools/AiWebsiteAge"),
 );
 export const SiteFlow = loaded(() => import("../DashBoard/SiteFlow/SiteFlow"));
+export const MobileSupport = loaded(() => import("../DashBoard/SiteFlow/MobileSupportTest"))
+export const SpeedTest = loaded(() => import("../DashBoard/SiteFlow/SpeedTest"))
+export const Headers = loaded(() => import("../DashBoard/SiteFlow/Header"))
+export const PWA = loaded(() => import("../DashBoard/SiteFlow/Pwa"))
+
+
 export const MainContent = loaded(
 	() => import("../DashBoard/ContentAnalyzer/MainContent"),
 );
