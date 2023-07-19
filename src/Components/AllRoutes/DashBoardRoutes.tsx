@@ -12,6 +12,10 @@ import {
 	KewWordTable,
 	AiTools,
 	SiteFlow,
+	MobileSupport,
+	SpeedTest,
+	Headers,
+	PWA
 } from "./Bundled";
 
 const DashBoardRoutes = () => {
@@ -45,7 +49,28 @@ const DashBoardRoutes = () => {
 
 		{
 			path: "/siteflow",
-			element: <SiteFlow />,
+			children: [
+				{
+					index: true,
+					element: <SiteFlow />,
+				},
+				{
+					path: "mobile-support",
+					element: <MobileSupport/>
+				},
+				{
+					path: "speed-test",
+					element: <SpeedTest/>
+				},
+				{
+					path: "headers",
+					element: <Headers/>
+				},
+				{
+					path: "pwa",
+					element: <PWA/>
+				},
+			]
 		},
 
 		{

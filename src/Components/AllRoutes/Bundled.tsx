@@ -47,3 +47,9 @@ export const SeoSearchEngine = loaded(
 
 export const AiTools = loaded(() => import("../DashBoard/AiTools/AiTools"));
 export const SiteFlow = loaded(() => import("../DashBoard/SiteFlow/SiteFlow"));
+export const MobileSupport = loaded(() => import("../DashBoard/SiteFlow/MobileSupportTest"))
+export const SpeedTest = loaded(() => import("../DashBoard/SiteFlow/SpeedTest"))
+export const Headers = loaded(() => import("../DashBoard/SiteFlow/Header"))
+export const PWA = loaded(() => import("../DashBoard/SiteFlow/Pwa"))
+
+
