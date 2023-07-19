@@ -2,39 +2,42 @@ import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import styled from "styled-components";
 
-const AiTools = () => {
+const MainContent = () => {
 	const location = useLocation();
+	console.log(location);
 	return (
 		<Container>
 			<Wrapper>
-				<Title>AI Tools</Title>
+				<Title>Content Analyzer</Title>
 				<SubTitle>
-					Keyword Data Explorer will help you appreciate the scale of
-					information that Domranker Keyword provides.
+					With On-Page API you can obtain a variety of on-page SEO data, which
+					you can use to eliminate hidden website errors and, consequently,
+					<br />
+					boost rankings
 				</SubTitle>
 				<CardHold>
-					<MyLink to={`${location.pathname}/text-rewritting`}>
+					<MyLink to={`${location.pathname}/density`}>
 						<Card>
 							<Logo />
-							<Text>Text Rewriting</Text>
+							<Text>Keyword density</Text>
 						</Card>
 					</MyLink>
-					<MyLink to={`${location.pathname}/readability-score`}>
+					<MyLink to={`${location.pathname}/extract-metatags`}>
 						<Card>
 							<Logo />
-							<Text>Readability Score</Text>
+							<Text>Extract Metatags</Text>
 						</Card>
 					</MyLink>
-					<MyLink to={`${location.pathname}/word-count`}>
+					<MyLink to={`${location.pathname}/title-tags`}>
 						<Card>
 							<Logo />
-							<Text>Word Count</Text>
+							<Text>Title Tag</Text>
 						</Card>
 					</MyLink>
-					<MyLink to={`${location.pathname}/website-age`}>
+					<MyLink to={`${location.pathname}/links`}>
 						<Card>
 							<Logo />
-							<Text>Website Age</Text>
+							<Text>Links</Text>
 						</Card>
 					</MyLink>
 				</CardHold>
@@ -43,7 +46,7 @@ const AiTools = () => {
 	);
 };
 
-export default AiTools;
+export default MainContent;
 
 const MyLink = styled(Link)`
 	text-decoration: none;

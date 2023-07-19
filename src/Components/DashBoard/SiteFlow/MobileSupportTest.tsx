@@ -29,6 +29,40 @@ const MobileSupportTest = () => {
 		  <hr />
 		  <ContainerCard>
 			  
+			  <Hold1>
+				  <DataCart1>
+					 <p>Device</p>
+					  <h2>Mobile</h2>
+				  </DataCart1>
+				  <DataCart1>
+					  <p>Google mobilr friendly score</p>
+					  <h2>Mobile</h2>
+				  </DataCart1>
+				  <DataCart1>
+					  <p>Mobile friendly</p>
+					  <h2>True</h2>
+				  </DataCart1>
+				
+				  
+			  </Hold1>
+			  <Hold2>
+
+				  	<DataCart1>
+					 <p>Optimized</p>
+					  <h2>02</h2>
+				  </DataCart1>
+				  <DataCart1>
+					  <p>improvements</p>
+					  <h2>03</h2>
+				  </DataCart1>
+				  <DataCart1>
+					  <p>Total Name</p>
+					  <h2>Mobile friendly</h2>
+				  </DataCart1>
+				  
+			  </Hold2>
+			  
+			  
 		  </ContainerCard>
 		
 
@@ -40,9 +74,85 @@ const MobileSupportTest = () => {
 export default MobileSupportTest
 
 
+				 
+const DataCart1 = styled.div`
+ width: 31%;
+ background-color:white;
+ height:150px;
+ display:flex;
+ flex-direction:column;
+ box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+ border-bottom: 4px solid #FFB703;
+
+
+ @media screen and (max-width: 768px) {
+		margin-top:10px;
+		width:90%;
+	};
+
+	p{
+		padding-left:10px;
+		font-weight:500;
+	};
+
+	h2{
+     padding-left:10px;
+	}
+
+
+`
+
+const Hold1 = styled.div`
+  width:96%;
+  height:auto;
+
+  display:flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  padding-top: 10px;
+  padding-bottom: 10px;
+
+   @media screen and (max-width: 768px) {
+		display: flex;
+		justify-content:center;
+		align-items:center;
+	}
+  
+`
+		  
+const Hold2 = styled.div`
+  margin-top:10px;
+    width:96%;
+  height:auto;
+
+  display:flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  padding-top: 10px;
+  padding-bottom: 10px;
+
+   @media screen and (max-width: 768px) {
+		display: flex;
+		justify-content:center;
+		align-items:center;
+	}
+`
 		  
 const ContainerCard = styled.div`
+   
+width:100%;
+height:500px;
 
+display: flex;
+flex-direction: column;
+align-items: center;
+height:auto;
+padding-top:20px;
+padding-bottom:20px;
+justify-content:space-between;
+  
 
 `
 

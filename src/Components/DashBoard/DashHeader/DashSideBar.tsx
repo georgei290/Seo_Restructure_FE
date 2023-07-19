@@ -143,28 +143,6 @@ const DashSideBar = () => {
 						marginTop: isActive ? "8px" : "8px",
 					};
 				}}
-				to='/businessdata'>
-				<Hold>
-					<IconHold>
-						<RiBarChartFill />
-					</IconHold>
-					<Nav>Business Data</Nav>
-				</Hold>
-			</NavLink>
-
-			<NavLink
-				style={({ isActive }) => {
-					return {
-						color: isActive ? "black" : "black",
-						textDecoration: isActive ? "none" : " none",
-						background: isActive ? "#EED9FF" : " none",
-						height: "50px",
-
-						borderLeft: isActive ? "4px solid #AE67FA" : "none",
-						display: isActive ? "flex" : "flex",
-						marginTop: isActive ? "8px" : "8px",
-					};
-				}}
 				to='/aitools'>
 				<Hold>
 					<IconHold>
