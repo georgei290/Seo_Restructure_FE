@@ -2,7 +2,67 @@ import React from 'react'
 import styled from 'styled-components'
 import SiteHeader from './SiteHeader'
 
+interface TableDataItem {
+	column1: string;
+	column2: string;
+	column3: string;
+	column4: string;
+
+}
+
+const TableContainer = styled.div`
+	overflow-x: auto;
+`;
+
+const Table = styled.table`
+	width: 100%;
+	border-collapse: collapse;
+	background-color: white;
+	overflow-x: scroll;
+
+	tbody > tr:nth-child(odd) {
+		background-color: #fafafc;
+	}
+`;
+
+const Th = styled.th`
+	padding: 8px;
+	text-align: left;
+	border-bottom: 1px solid #ddd;
+	border-right: 1px solid #ddd;
+`;
+
+const Td = styled.td`
+	padding: 8px;
+	text-align: left;
+	border-right: 1px solid #ddd;
+	white-space: pre-wrap;
+	word-wrap: break-word;
+
+	&:last-child {
+		border-right: none;
+	}
+`;
+
+
 const SpeedTest = () => {
+	const data: TableDataItem[] = [
+		{
+			column1: "Desktop",
+			column2: "60",
+			column3: "5",
+			column4: "5",
+
+		},
+		{
+			column1: "Mobile",
+			column2: "50",
+			column3: "6",
+			column4: "6",
+
+		}
+		// Add more data items as needed
+	];
   return (
       <Container>
 		  <SiteHeader />
@@ -21,7 +81,38 @@ const SpeedTest = () => {
 								Analyze
 							</Button>
 						</Input2>
-					</Main>
+			  </Main>
+			  <br/>
+			  <br/>
+			  <br/>
+			  
+			  	<TableTitle>
+					<span>Speed Result</span>
+				</TableTitle>
+				<TableContainer>
+					<Table>
+						<thead>
+							<tr>
+								<Th>Device</Th>
+								<Th>Google  PageSpeed Score</Th>
+								<Th>Optimized</Th>
+								<Th>Improments</Th>
+								
+							</tr>
+						</thead>
+						<tbody>
+							{data.map((item, index) => (
+								<tr key={index}>
+									<Td>{item.column1}</Td>
+									<Td>{item.column2}</Td>
+									<Td>{item.column3}</Td>
+									<Td>{item.column4}</Td>
+									
+								</tr>
+							))}
+						</tbody>
+					</Table>
+				</TableContainer>
 		</Wrapper>
          
       </Container>
@@ -29,6 +120,25 @@ const SpeedTest = () => {
 }
 
 export default SpeedTest
+
+
+const TableTitle = styled.div`
+	width: 100%;
+	height: 60px;
+	background-color: white;
+	display: flex;
+	margin-bottom: 10px;
+
+	border-radius: 5px;
+	align-items: center;
+	span {
+		margin-left: 20px;
+		font-size: 20px;
+		font-weight: 500;
+		color: #ae67fa;
+	}
+`;
+
 
 
 const InputText = styled.div`
