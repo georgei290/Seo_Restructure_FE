@@ -1,19 +1,25 @@
-import React from 'react'
-import styled from 'styled-components'
-import SiteHeader from './SiteHeader'
+import React, { useState } from "react";
+import styled from "styled-components";
+import SiteHeader from "./SiteHeader";
+import {
+	UseAppDispach,
+	useAppSelector,
+} from "../../../utils/stateManagement/store";
+import LoadingComp from "../../../utils/ReusedComp/LoadingComp";
+import { HeadersSearch } from "../../../utils/APICalls";
+import { HeaderData } from "../../../utils/stateManagement/authState";
+import EmptyData from "../../../utils/ReusedComp/EmptyData";
 
-
-
+import pic from "../images/5.svg";
 
 interface TableDataItem {
 	column1: string;
 	column2: string;
-
-
 }
 
 const TableContainer = styled.div`
 	overflow-x: auto;
+	padding-bottom: 30px;
 `;
 
 const Table = styled.table`
@@ -33,12 +39,11 @@ const Th = styled.th`
 	border-bottom: 1px solid #ddd;
 	border-right: 1px solid #ddd;
 `;
-const Th1= styled.th`
+const Th1 = styled.th`
 	padding: 3px;
-	
+
 	border-bottom: 1px solid #ddd;
 	border-right: 1px solid #ddd;
-	
 `;
 
 const Td = styled.td`
@@ -64,204 +69,119 @@ const Td1 = styled.td`
 	}
 `;
 
-
 const Header = () => {
+	const [keyword, setKeyword] = useState<string>("");
+	const [load, setLoad] = useState<boolean>(false);
+	const user = useAppSelector((state) => state.currentUser);
+	const readHeader = useAppSelector((state) => state.header);
+	const dispatch = UseAppDispach();
+	const SearchHeaderNow = async () => {
+		setLoad(true);
+		await HeadersSearch(keyword, user?.data?._id, user?.token).then(
+			async (response: any) => {
+				setLoad(false);
+				console.log(response);
+				dispatch(HeaderData(response?.data));
+			},
+		);
+	};
+	if (load) return <LoadingComp />;
 
-		const data: TableDataItem[] = [
-		{
-			column1: "",
-			column2: "Copy Google Ads turns 22: A look back at the biggest changes and advances in search",
-		
+	return (
+		<Container>
+			<SiteHeader />
+			<Wrapper>
+				<Main
+					onSubmit={(e) => {
+						e.preventDefault();
+						SearchHeaderNow();
+					}}
+					
+					>
+					<InputText>Keyword</InputText>
+					<Input2>
+						<Input3
+							onChange={(e) => {
+								setKeyword(e.target.value);
+							}}
+							placeholder='eg. https://searchengineland.com'
+							type='url'
+						/>
 
-		},
-		{
-			column1: "",
-			column2: "Marketing leadership: The dangers of ego",
-			
+						<Button type = "submit">Analyze</Button>
+					</Input2>
+					<br />
 
-		},
-		{
-			column1: "",
-			column2: "Yelp has created a new attribute, Business Fund, and Resource Hub for veterans",
-			
-
-		}
-		// Add more data items as needed
-	];
-		const data1: TableDataItem[] = [
-		{
-			column1: "",
-			column2: "Microsoft FY23 Q1: LinkedIn up 17%, search and news revenue up 11%",
-		
-
-		},
-		{
-			column1: "",
-			column2: "Google FY22 Q3 earnings: YouTube earnings down, ad revenue up, advertisers pulling back?",
-			
-
-		},
-		{
-			column1: "",
-			column2: "Four new Apple Search Ad placement options",
-			
-
-		},
-		{
-			column1: "",
-			column2: "Email marketing is continually developing. Are you keeping up?",
-			
-
-		}
-		// Add more data items as needed
-	];
-		const data2: TableDataItem[] = [
-		{
-			column1: "",
-			column2: "Happenings",
-		
-
-		},
-		{
-			column1: "",
-			column2: "World",
-			
-
-		},
-		{
-			column1: "",
-			column2: "K-Drama",
-			
-
-		},
-		{
-			column1: "",
-			column2: "Governance",
-			
-
-		},
-		{
-			column1: "",
-			column2: "The 'Fast X' Trailer Is Four Minutes of Glorious Absurdity (Watch!)",
-			
-
-		}
-		// Add more data items as needed
-	];
-  return (
-     <Container>
-        <SiteHeader/>
-           <Wrapper>
-			  
-					<Main>
-						<InputText>Keyword</InputText>
-						<Input2>
-							<Input3
-							
-								placeholder='Enter The Target'
-								type='search'
+					{Object.keys(readHeader).length === 0 && (
+						<div>
+							{" "}
+							<EmptyData
+								avatar={pic}
+								message='Enter Your Url in the Input Bar Above'
 							/>
+						</div>
+					)}
+					{readHeader?.status === "error" && (
+						<div>
+							<EmptyData
+								avatar={pic}
+								message='Sorry we couldnt find any result for this search.'
+							/>
+						</div>
+					)}
 
-							<Button>
-								Analyze
-							</Button>
-				  </Input2>
-				  <br />
-				  				<TableContainer>
-					<Table>
-						<thead>
-							<tr>
-								  <Th1>
-									  <div>#</div>
-								</Th1>
-								<Th>htags[h1]</Th>
-								
-								
-							</tr>
-						</thead>
-						<tbody>
-							{data.map((item, index) => (
-								<tr key={index}>
-									<Td>{item.column1}</Td>
-									<Td>{item.column2}</Td>
-								
-									
-								</tr>
-							))}
-						</tbody>
-					</Table>
-				</TableContainer>
+					{readHeader?.status === "ok" && (
+						<>
+							{Object.keys(readHeader?.data?.data).some(
+								(headingLevel) =>
+									readHeader?.data?.data[headingLevel].length > 0,
+							) ? (
+								Object.keys(readHeader?.data?.data).map(
+									(headingLevel: any, index) => {
+										const headingContent: any =
+											readHeader?.data?.data[headingLevel];
+										if (headingContent.length > 0) {
+											return (
+												<TableContainer key={index}>
+													<Table>
+														<thead>
+															<tr>
+																<Th>#</Th>
+																<Th>htags[{index + 1}]</Th>
+															</tr>
+														</thead>
+														<tbody>
+															{headingContent.map(
+																(item: any, itemIndex: any) => (
+																	<tr key={itemIndex}>
+																		<Td></Td>
+																		<Td>{item}</Td>
+																	</tr>
+																),
+															)}
+														</tbody>
+													</Table>
+												</TableContainer>
+											);
+										}
+										return null; // Don't render if no content
+									},
+								)
+							) : (
+								<EmptyData
+									avatar={pic}
+									message="Sorry, we couldn't find any result for this search."
+								/>
+							)}
+						</>
+					)}
+				</Main>
+			</Wrapper>
+		</Container>
+	);
+};
 
-				  <br/>
-				  <br/>
-				  <br/>
-				  				<TableContainer>
-					<Table>
-						<thead>
-							<tr>
-								<Th>#</Th>
-								<Th>htags[h2]</Th>
-								
-								
-							</tr>
-						</thead>
-						<tbody>
-							{data1.map((item, index) => (
-								<tr key={index}>
-									<Td>{item.column1}</Td>
-									<Td>{item.column2}</Td>
-								
-									
-								</tr>
-							))}
-						</tbody>
-					</Table>
-				</TableContainer>
-				  <br/>
-				  <br/>
-				  <br/>
-				  <br/>
-				  <br/>
-				  				<TableContainer>
-					<Table>
-						<thead>
-							<tr>
-								  <Th1>
-									   <div>#</div>
-								</Th1>
-								<Th>htags[h2]</Th>
-								
-								
-							</tr>
-						</thead>
-						<tbody>
-							{data2.map((item, index) => (
-								<tr key={index}>
-									<Td1>{item.column1}</Td1>
-									<Td>{item.column2}</Td>
-								
-									
-								</tr>
-							))}
-						</tbody>
-					</Table>
-				  </TableContainer>
-				  <br/>
-				  <br/>
-				  <br/>
-				  <br/>
-				  <br/>
-				  <br/>
-				  <br/>
-					</Main>
-		</Wrapper>
-      </Container>
-  )
-}
-
-export default Header
-
-
+export default Header;
 
 const TableTitle = styled.div`
 	width: 100%;
@@ -280,7 +200,6 @@ const TableTitle = styled.div`
 	}
 `;
 
-
 const InputText = styled.div`
 	font-size: 12px;
 	margin-bottom: 3px;
@@ -297,7 +216,7 @@ const Input3 = styled.input`
 	font-family: Montserrat;
 `;
 
-const Main = styled.div`
+const Main = styled.form`
 	width: 100%;
 	margin-top: 10px;
 	margin-right: 40px;
@@ -335,9 +254,9 @@ const Button = styled.button`
 `;
 
 const Wrapper = styled.div`
-  margin-left: 25px;
-  margin-top: 10px;
-  /* width : 98% */
+	margin-left: 25px;
+	margin-top: 10px;
+	/* width : 98% */
 `;
 const Container = styled.div`
 	width: calc(100vw - 240px);

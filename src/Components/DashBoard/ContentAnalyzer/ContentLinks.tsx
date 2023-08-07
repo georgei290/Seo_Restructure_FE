@@ -1,6 +1,15 @@
-import React from "react";
+import React, { useState, PureComponent } from "react";
 import styled from "styled-components";
 import ContentNavigation from "./ContentNavigation";
+import {
+	UseAppDispach,
+	useAppSelector,
+} from "../../../utils/stateManagement/store";
+import LoadingComp from "../../../utils/ReusedComp/LoadingComp";
+import { ContentLinksSearch } from "../../../utils/APICalls";
+import EmptyData from "../../../utils/ReusedComp/EmptyData";
+import pic from "../images/5.svg";
+import { linkData } from "../../../utils/stateManagement/authState";
 
 interface TableDataItem {
 	column1: string;
@@ -38,156 +47,212 @@ const Td = styled.td`
 	border-right: 1px solid #ddd;
 	white-space: pre-wrap;
 	word-wrap: break-word;
+	max-width: 350px;
+	overflow: hidden;
 
 	&:last-child {
 		border-right: none;
 	}
 `;
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 const ContentLinks = () => {
-	const data: TableDataItem[] = [
-		{
-			column1: "https://www.seoreviewtools.com/seo-content-editor",
-			column2: "Data 1",
-			column3: "Value 1",
-			column4: "value4",
-			column5: "Search Engine Land",
-		},
-		{
-			column1: "Row 2",
-			column2: "Data 2",
-			column3: "Value 2",
-			column4: "value4",
-			column5: "value5",
-		},
-		{
-			column1: "Row 3",
-			column2: "Data 3",
-			column3: "Value 3",
-			column4: "value4",
-			column5: "value5",
-		},
-		{
-			column1: "Row 3",
-			column2: "Data 3",
-			column3: "Value 3",
-			column4: "value4",
-			column5: "value5",
-		},
-		{
-			column1: "Row 3",
-			column2: "Data 3",
-			column3: "Value 3",
-			column4: "value4",
-			column5: "value5",
-		},
-		// Add more data items as needed
-	];
+	const [keyword, setKeyword] = useState<string>("");
+	const [load, setLoad] = useState<boolean>(false);
+	const user = useAppSelector((state) => state.currentUser);
+	const readData = useAppSelector((state) => state.links);
+	const dispatch = UseAppDispach();
+	const SearchKeywordLinksNow = async () => {
+		setLoad(true);
+		await ContentLinksSearch(keyword, user?.data?._id, user?.token).then(
+			async (response: any) => {
+				setLoad(false);
+				// console.log(response);
+				dispatch(linkData(response?.data));
+			},
+		);
+	};
+	if (load) return <LoadingComp />;
+
 	return (
 		<Container>
 			<ContentNavigation />
 			<Wrapper>
-				<Main>
+				<Main
+					onSubmit={(e) => {
+						e.preventDefault();
+						SearchKeywordLinksNow();
+					}}>
 					<InputText>Search Keyword</InputText>
 					<Input2>
 						<Input3
-							// value={googleKeywords}
-							required={true}
-							placeholder='Enter search'
-							type='search'
+							required
+							onChange={(e) => {
+								setKeyword(e.target.value);
+							}}
+							placeholder='eg. https://searchengineland.com'
+							type='url'
 						/>
 						<Button>Search</Button>
 					</Input2>
 				</Main>
 
-				<BoxesDiv>
-					<MainBox>
-						<TopBox>
-							<Toptitle>Analysis Data</Toptitle>
-							<TopSub>0</TopSub>
-						</TopBox>
-						<ButtomBoxHold>
-							<TomBox>
-								<ButtomTitle>Blogs</ButtomTitle>
-								<TomSub>0</TomSub>
-							</TomBox>
-							<TomBox>
-								<ButtomTitle>Ecomerce</ButtomTitle>
-								<TomSub>0</TomSub>
-							</TomBox>
-							<TomBox>
-								<ButtomTitle>News</ButtomTitle>
-								<TomSub>0</TomSub>
-							</TomBox>
-						</ButtomBoxHold>
-					</MainBox>
-					<MiddleBox>
-						<InnerMidBox>
-							<InnerTitle>Item Count</InnerTitle>
-							<InnerSub>0</InnerSub>
-						</InnerMidBox>
-						<InnerMidBox>
-							<InnerTitle>Page Type</InnerTitle>
-							<InnerSub>0</InnerSub>
-						</InnerMidBox>
-					</MiddleBox>
-					<MainBox>
-						<MainTop>
-							<Toptitle>Domain Rank</Toptitle>
-							<TopSub>0</TopSub>
-						</MainTop>
-						<MainButtom>
-							<RateBox>
-								<RateBar>
-									<RateBar2 />
-								</RateBar>
-							</RateBox>
-							<RateData>
-								<DataRate>
-									<RateTitle>URL Rank</RateTitle>
-									{/* <RateSub>78</RateSub> */}
-								</DataRate>
-								<DataRate>
-									<RateTitle>Spam Score</RateTitle>
-									{/* <RateSub>22</RateSub> */}
-								</DataRate>
-							</RateData>
-						</MainButtom>
-					</MainBox>
-				</BoxesDiv>
+				<br />
+				<br />
+				<br />
+				{Object.keys(readData).length === 0 && (
+					<div>
+						{" "}
+						<EmptyData
+							avatar={pic}
+							message='Enter Your keyword in the Input Bar Above'
+						/>
+					</div>
+				)}
+
+				{readData?.status === "error" && (
+					<div>
+						<EmptyData
+							avatar={pic}
+							message='Sorry we couldnt find any result for this search.'
+						/>
+					</div>
+				)}
+
+				{readData?.status === "ok" && (
+					<BoxesDiv>
+						<MainBox>
+							<TopBox>
+								<Toptitle>Total links</Toptitle>
+								<TopSub>
+									{readData?.data && readData?.data?.data[0]["Total links"]}
+								</TopSub>
+							</TopBox>
+							<ButtomBoxHold>
+								<TomBox>
+									<ButtomTitle>External links</ButtomTitle>
+									<TomSub>
+										{readData?.data &&
+											readData?.data?.data[0]["External links"]}
+									</TomSub>
+								</TomBox>
+								<TomBox>
+									<ButtomTitle>Internal</ButtomTitle>
+									<TomSub>
+										{readData?.data && readData?.data?.data[0]["Internal"]}
+									</TomSub>
+								</TomBox>
+								<TomBox>
+									<ButtomTitle>Nofollow count</ButtomTitle>
+									<TomSub>
+										{readData?.data &&
+											readData?.data?.data[0]["Nofollow count"]}
+									</TomSub>
+								</TomBox>
+							</ButtomBoxHold>
+						</MainBox>
+						<MiddleBox>
+							<InnerMidBox>
+								<InnerTitle>Duplicate links</InnerTitle>
+								<InnerSub>
+									{readData?.data && readData?.data?.data[0]["Duplicate links"]}
+								</InnerSub>
+							</InnerMidBox>
+							<InnerMidBox>
+								<InnerTitle>Tool Name</InnerTitle>
+								<InnerSub>On page links</InnerSub>
+							</InnerMidBox>
+						</MiddleBox>
+						<MainBox>
+							<MainTop>
+								<Toptitle>No alt tag</Toptitle>
+								<TopSub>
+									{" "}
+									{readData?.data && readData?.data?.data[0]["No alt tag"]}
+								</TopSub>
+							</MainTop>
+							<MainButtom>
+								<RateBox>
+									<RateBar>
+										<RateBar2 />
+									</RateBar>
+								</RateBox>
+								<RateData>
+									<DataRate>
+										<RateTitle>URL Rank</RateTitle>
+										{/* <RateSub>78</RateSub> */}
+									</DataRate>
+									<DataRate>
+										<RateTitle>Spam Score</RateTitle>
+										{/* <RateSub>22</RateSub> */}
+									</DataRate>
+								</RateData>
+							</MainButtom>
+						</MainBox>
+					</BoxesDiv>
+				)}
 
 				<br />
 				<br />
-				<TableTitle>
-					<span>On Page Links </span>
-				</TableTitle>
-				<TableContainer>
-					<Table>
-						<thead>
-							<tr>
-								<Th>Url</Th>
-								<Th>Link type</Th>
-								<Th>Nofollow </Th>
-								<Th>
-									Anchor
-									<br /> type
-								</Th>
-								<Th>Anchor text</Th>
-							</tr>
-						</thead>
-						<tbody>
-							{data.map((item, index) => (
-								<tr key={index}>
-									<Td>{item.column1}</Td>
-									<Td>{item.column2}</Td>
-									<Td>{item.column3}</Td>
-									<Td>{item.column4}</Td>
-									<Td>{item.column5}</Td>
-								</tr>
-							))}
-						</tbody>
-					</Table>
-				</TableContainer>
+
+				{readData?.status === "ok" && (
+					<>
+						<TableTitle>
+							<span>On Page Links </span>
+						</TableTitle>
+						<TableContainer>
+							<Table>
+								<thead>
+									<tr>
+										<Th>Url</Th>
+										<Th>Link type</Th>
+										<Th>Nofollow </Th>
+										<Th>
+											Anchor
+											<br /> type
+										</Th>
+										<Th>Anchor text</Th>
+									</tr>
+								</thead>
+								<tbody>
+									{readData?.data &&
+										readData?.data?.data[1].map((item: any, index: any) => (
+											<tr key={index}>
+												<Td>
+													<a
+														style={{
+															color: "green",
+														}}
+														href={item.URL}>
+														{item.URL}
+													</a>
+												</Td>
+												<Td>{item["Link type"]}</Td>
+												<Td>{item["Nofollow"]}</Td>
+												<Td>{item["Anchor type"]}</Td>
+												<Td>{item["Anchor text"]}</Td>
+											</tr>
+										))}
+								</tbody>
+							</Table>
+						</TableContainer>
+					</>
+				)}
 			</Wrapper>
 		</Container>
 	);
@@ -227,7 +292,6 @@ const BoxesDiv = styled.div`
 	display: flex;
 	justify-content: center;
 	flex-wrap: wrap;
- 
 `;
 const MainBox = styled.div`
 	height: 200px;
@@ -340,7 +404,7 @@ const Button = styled.button`
 	}
 `;
 
-const Main = styled.div`
+const Main = styled.form`
 	width: 100%;
 	margin-top: 10px;
 	margin-right: 40px;

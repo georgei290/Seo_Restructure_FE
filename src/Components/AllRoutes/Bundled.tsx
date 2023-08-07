@@ -22,23 +22,11 @@ export const SeoChecker = loaded(
 export const BackLinkChecker = loaded(
 	() => import("../DashBoard/BackLinkChecker/BackLinkChecker"),
 );
-export const BusinessData = loaded(
-	() => import("../DashBoard/BusinessData/BusinessData"),
-);
+
+
+
 export const ContentAnalyzer = loaded(
 	() => import("../DashBoard/ContentAnalyzer/ContentAnalyzer"),
-);
-export const OnPageData = loaded(
-	() => import("../DashBoard/OnPageData/OnPageData"),
-);
-
-export const DetaildOnpage = loaded(
-	() => import("../DashBoard/OnPageData/DetailsOnpage"),
-);
-
-export const Keywords = loaded(() => import("../DashBoard/Keywords/KeyWords"));
-export const KewWordTable = loaded(
-	() => import("../DashBoard/Keywords/KewWordTable"),
 );
 
 export const SeoSearchEngine = loaded(
@@ -59,11 +47,14 @@ export const AiWebsiteAge = loaded(
 	() => import("../DashBoard/AiTools/AiWebsiteAge"),
 );
 export const SiteFlow = loaded(() => import("../DashBoard/SiteFlow/SiteFlow"));
-export const MobileSupport = loaded(() => import("../DashBoard/SiteFlow/MobileSupportTest"))
-export const SpeedTest = loaded(() => import("../DashBoard/SiteFlow/SpeedTest"))
-export const Headers = loaded(() => import("../DashBoard/SiteFlow/Header"))
-export const PWA = loaded(() => import("../DashBoard/SiteFlow/Pwa"))
-
+export const MobileSupport = loaded(
+	() => import("../DashBoard/SiteFlow/MobileSupportTest"),
+);
+export const SpeedTest = loaded(
+	() => import("../DashBoard/SiteFlow/SpeedTest"),
+);
+export const Headers = loaded(() => import("../DashBoard/SiteFlow/Header"));
+export const PWA = loaded(() => import("../DashBoard/SiteFlow/Pwa"));
 
 export const MainContent = loaded(
 	() => import("../DashBoard/ContentAnalyzer/MainContent"),
@@ -80,3 +71,24 @@ export const ContentTitle = loaded(
 export const ContentLinks = loaded(
 	() => import("../DashBoard/ContentAnalyzer/ContentLinks"),
 );
+
+export const MainKeywords = loaded(
+	() => import("../DashBoard/Keywords/MainKeywords"),
+);
+
+
+export const KeyWordResearch = loaded(
+	() => import("../DashBoard/Keywords/KeyWordResearch"),
+);
+
+
+
+export const DifficultySuggession = loaded(
+	() => import("../DashBoard/Keywords/DifficultySuggession"),
+);
+
+
+export const KeywordFast = loaded(
+	() => import("../DashBoard/Keywords/KeywordFast"),
+);
+

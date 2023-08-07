@@ -1,14 +1,9 @@
 import React from "react";
 import styled from "styled-components";
 
-interface TableDataItem {
-	column1: string;
-	column2: string;
-	column3: string;
-}
-
 const TableContainer = styled.div`
 	overflow-x: auto;
+	padding-bottom: 30px;
 `;
 
 const Table = styled.table`
@@ -18,8 +13,7 @@ const Table = styled.table`
 	overflow-x: scroll;
 
 	tbody > tr:nth-child(odd) {
-		background-color: #FAFAFC;
-;
+		background-color: #fafafc;
 	}
 `;
 
@@ -41,31 +35,39 @@ const Td = styled.td`
 	}
 `;
 
-const KeyWordTable: React.FC = () => {
-	const data: TableDataItem[] = [
-		{ column1: "Row 1", column2: "Data 1", column3: "Value 1" },
-		{ column1: "Row 2", column2: "Data 2", column3: "Value 2" },
-		{ column1: "Row 3", column2: "Data 3", column3: "Value 3" },
-		// Add more data items as needed
-	];
+interface Iprops {
+	data: any;
+}
 
+const KeyWordTable: React.FC<Iprops> = ({ data }) => {
+	console.log(data);
 	return (
 		<div>
 			<TableContainer>
 				<Table>
 					<thead>
 						<tr>
-							<Th>Header 1</Th>
-							<Th>Header 2</Th>
-							<Th>Header 3</Th>
+							<Th>#</Th>
+							<Th>Keyword usage</Th>
+							<Th>Avg Length</Th>
+							<Th>Range</Th>
 						</tr>
 					</thead>
 					<tbody>
-						{data.map((item, index) => (
+						{data.map(([title, content]: any, index: any) => (
 							<tr key={index}>
-								<Td>{item.column1}</Td>
-								<Td>{item.column2}</Td>
-								<Td>{item.column3}</Td>
+								<Td>{title}</Td>
+								{content["Keyword usage"] ? (
+									<Td>{content["Keyword usage"]}</Td>
+								) : (
+									<Td>-</Td>
+								)}
+								{content["avg Length"] ? (
+									<Td>{content["avg Length"]}</Td>
+								) : (
+									<Td>-</Td>
+								)}
+								{content?.Range ? <Td>{content.Range}</Td> : <Td>-</Td>}
 							</tr>
 						))}
 					</tbody>

@@ -1,17 +1,21 @@
-import React, { useState, PureComponent } from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
 
 import LoadingComp from "../../../utils/ReusedComp/LoadingComp";
 import {
+	DifficultyData,
+	ResearchData,
+} from "../../../utils/stateManagement/authState";
+import {
 	UseAppDispach,
 	useAppSelector,
 } from "../../../utils/stateManagement/store";
-import { ContentDensitySearch, KeywordFast } from "../../../utils/APICalls";
+import { KeywordDifficultiesSuggession } from "../../../utils/APICalls";
+import LocData from "../../../utils/ReusedComp/Locations.json";
+import LangData from "../../../utils/ReusedComp/Languages.json";
 import EmptyData from "../../../utils/ReusedComp/EmptyData";
 import pic from "../images/5.svg";
-import ContentNavigation from "./ContentNavigation";
-import { densityData } from "../../../utils/stateManagement/authState";
-import { PieChart, Pie, Legend, Tooltip, ResponsiveContainer } from "recharts";
+import KeyHead from "./KeyHead";
 
 const TableContainer = styled.div`
 	overflow-x: auto;
@@ -47,37 +51,71 @@ const Td = styled.td`
 	}
 `;
 
-const ContentDensity = () => {
+const DifficultySuggession = () => {
 	const [keyword, setKeyword] = useState<string>("");
 	const [load, setLoad] = useState<boolean>(false);
+	const [location, setLocation] = useState<string>("United States");
+	const [language, setLanguage] = useState<string>("English");
 	const user = useAppSelector((state) => state.currentUser);
-	const readData = useAppSelector((state) => state.density);
+	const readDiff = useAppSelector((state) => state.difficulty);
 	const dispatch = UseAppDispach();
-	const SearchKeywordDensityNow = async () => {
+	const SearchKeywordDifficultyNow = async () => {
 		setLoad(true);
-		await ContentDensitySearch(keyword, user?.data?._id, user?.token).then(
-			async (response: any) => {
-				setLoad(false);
-				// console.log(response);
-				dispatch(densityData(response?.data));
-			},
-		);
+		await KeywordDifficultiesSuggession(
+			keyword,
+			user?.data?._id,
+			user?.token,
+			language,
+			location,
+		).then(async (response: any) => {
+			setLoad(false);
+			console.log(response);
+			dispatch(DifficultyData(response));
+		});
 	};
 	if (load) return <LoadingComp />;
 
-	const processedData = readData?.data?.data.map((item:any) => ({
-		"Keyword density": parseFloat(item["Keyword density"] ) // Convert percentage to a decimal
-	}));
-
 	return (
 		<Container>
-			<ContentNavigation />
+			<KeyHead />
 			<Wrapper>
 				<Main
 					onSubmit={(e) => {
 						e.preventDefault();
-						SearchKeywordDensityNow();
+						SearchKeywordDifficultyNow();
 					}}>
+					<InputHold>
+						<Main>
+							<InputText> Select Language</InputText>
+							<Select
+								required
+								onChange={(e) => {
+									setLanguage(e.target.value);
+								}}>
+								{LangData?.map((languages, i: number) => (
+									<option key={i} value={languages.value}>
+										{languages.name}
+									</option>
+								))}
+							</Select>
+						</Main>
+						<Main>
+							<InputText>Select Location</InputText>
+							<Select
+								required
+								onChange={(e) => {
+									setLocation(e.target.value);
+								}}>
+								{LocData?.map((locations, i: number) => (
+									<option key={i} value={locations.value}>
+										{locations.name}
+									</option>
+								))}
+							</Select>
+						</Main>
+					</InputHold>
+					<br />
+
 					<InputText>Keyword</InputText>
 					<Input2>
 						<Input3
@@ -85,8 +123,8 @@ const ContentDensity = () => {
 							onChange={(e) => {
 								setKeyword(e.target.value);
 							}}
-							placeholder='eg. https://searchengineland.com'
-							type='url'
+							placeholder='eg. SEO Tools'
+							type='search'
 						/>
 
 						<Button>Analyze</Button>
@@ -95,7 +133,7 @@ const ContentDensity = () => {
 				<br />
 				<br />
 				<br />
-				{Object.keys(readData).length === 0 && (
+				{Object.keys(readDiff).length === 0 && (
 					<div>
 						{" "}
 						<EmptyData
@@ -105,7 +143,7 @@ const ContentDensity = () => {
 					</div>
 				)}
 
-				{readData?.status === "error" && (
+				{readDiff?.status === "error" && (
 					<div>
 						<EmptyData
 							avatar={pic}
@@ -114,42 +152,10 @@ const ContentDensity = () => {
 					</div>
 				)}
 
-				{readData?.status === "ok" && (
-					<div
-						style={{
-							display: "flex",
-							justifyContent: "center",
-							alignItems: "center",
-							width: "100%",
-							marginLeft: "100px",
-						}}>
-						<ResponsiveContainer width={900} height={400}>
-							<PieChart width={400} height={400}>
-								<Pie
-									dataKey='Keyword density'
-									isAnimationActive={false}
-									data={processedData}
-									cx={300}
-									cy={200}
-									outerRadius={150}
-									fill='#8884d8'
-									label
-								/>
-								<Tooltip
-									formatter={(value, name, entry) => [
-										`keyword Density : ${value}%`,
-										"",
-									]}
-								/>
-							</PieChart>
-						</ResponsiveContainer>
-					</div>
-				)}
-
-				{readData?.status === "ok" && (
+				{readDiff?.difficult?.status === "ok" && (
 					<div>
 						<TableTitle>
-							<span>Content Density</span>
+							<span>keyword difficulty</span>
 						</TableTitle>
 						<TableContainer>
 							<Table>
@@ -157,23 +163,54 @@ const ContentDensity = () => {
 									<tr>
 										<Th>#</Th>
 										<Th>Keyword</Th>
-										<Th>Frequency</Th>
-										<Th>Result</Th>
-										<Th>Keyword Density</Th>
-										<Th>Keyword Type</Th>
+										<Th>difficulty</Th>
 									</tr>
 								</thead>
 								<tbody>
-									{readData?.data?.data?.map((item: any, index: any) => (
-										<tr key={index}>
-											<Td></Td>
-											<Td>{item?.Keyword}</Td>
-											<Td>{item?.Frequency}</Td>
-											<Td>{item?.Result}</Td>
-											<Td>{item["Keyword density"]}</Td>
-											<Td>{item["Keyword type"]}</Td>
-										</tr>
-									))}
+									{readDiff?.difficult?.data?.data?.map(
+										(item: any, index: any) => (
+											<tr key={index}>
+												<Td></Td>
+												<Td>{item?.keyword}</Td>
+												<Td>{item["keyword difficulty"]}</Td>
+											</tr>
+										),
+									)}
+								</tbody>
+							</Table>
+						</TableContainer>
+					</div>
+				)}
+				<br />
+
+				{readDiff?.suggestion?.status === "ok" && (
+					<div>
+						<TableTitle>
+							<span>Keyword Suggestion</span>
+						</TableTitle>
+						<TableContainer>
+							<Table>
+								<thead>
+									<tr>
+										<Th>#</Th>
+										<Th>Keyword</Th>
+										<Th>competition</Th>
+										<Th>cpc</Th>
+										<Th>search_volume</Th>
+									</tr>
+								</thead>
+								<tbody>
+									{readDiff?.suggestion?.data?.data?.map(
+										(item: any, index: any) => (
+											<tr key={index}>
+												<Td></Td>
+												<Td>{item?.keyword}</Td>
+												<Td>{item?.competition}</Td>
+												<Td>{item?.cpc}</Td>
+												<Td>{item?.search_volume}</Td>
+											</tr>
+										),
+									)}
 								</tbody>
 							</Table>
 						</TableContainer>
@@ -184,8 +221,34 @@ const ContentDensity = () => {
 	);
 };
 
-export default ContentDensity;
+export default DifficultySuggession;
 
+const Select = styled.select`
+	width: 100%;
+	height: 35px;
+	border-radius: 2px;
+	border: 1px solid #e2e2e2;
+	font-family: Montserrat;
+	outline: none;
+	padding-left: 10px;
+	margin-right: 10px;
+	::placeholder {
+		color: gray;
+	}
+	@media screen and (max-width: 768px) {
+		width: 100%;
+	}
+`;
+
+const InputHold = styled.div`
+	margin-top: 15px;
+	width: 100%;
+	display: flex;
+
+	@media screen and (max-width: 768px) {
+		flex-wrap: wrap;
+	}
+`;
 const TableTitle = styled.div`
 	width: 100%;
 	height: 60px;

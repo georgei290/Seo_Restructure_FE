@@ -40,31 +40,43 @@ const Td = styled.td`
 	}
 `;
 
-const ResultTable: React.FC = () => {
-	const data: TableDataItem[] = [
-		{ column1: "Row 1", column2: "Data 1", column3: "Value 1" },
-		{ column1: "Row 2", column2: "Data 2", column3: "Value 2" },
-		{ column1: "Row 3", column2: "Data 3", column3: "Value 3" },
-		// Add more data items as needed
-	];
+interface Iprops {
+	data: any;
+}
 
+const ResultTable: React.FC<Iprops> = ({ data }) => {
 	return (
 		<div>
 			<TableContainer>
 				<Table>
 					<thead>
 						<tr>
-							<Th>Header 1</Th>
-							<Th>Header 2</Th>
-							<Th>Header 3</Th>
+							<Th>Title - URL</Th>
+							<Th>Breadcrumb</Th>
+							<Th>Description</Th>
+							<Th>
+								Rank
+								<br /> Group
+							</Th>
+							<Th>Domain</Th>
 						</tr>
 					</thead>
 					<tbody>
-						{data.map((item, index) => (
+						{data.map((item: any, index: any) => (
 							<tr key={index}>
-								<Td>{item.column1}</Td>
-								<Td>{item.column2}</Td>
-								<Td>{item.column3}</Td>
+								<Td style={{ color: " #1976D2" }}>
+									{item.title}
+									<br />
+									<a
+										href={item.url}
+										style={{ color: "#136F48", fontWeight: "bold" }}>
+										{item.url}
+									</a>
+								</Td>
+								<Td>{item.breadcrumb}</Td>
+								<Td>{item.description}</Td>
+								<Td>{item.rank_group}</Td>
+								<Td>{item.domain}</Td>
 							</tr>
 						))}
 					</tbody>

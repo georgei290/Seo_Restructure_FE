@@ -1,14 +1,20 @@
-import React from 'react'
-import styled from 'styled-components'
-import SiteHeader from './SiteHeader'
+import React, { useState } from "react";
+import styled from "styled-components";
+import SiteHeader from "./SiteHeader";
+import LoadingComp from "../../../utils/ReusedComp/LoadingComp";
+import { SpeedTestData } from "../../../utils/stateManagement/authState";
+import {
+	UseAppDispach,
+	useAppSelector,
+} from "../../../utils/stateManagement/store";
+import { PageSpeedSearch } from "../../../utils/APICalls";
+import EmptyData from "../../../utils/ReusedComp/EmptyData";
+import pic from "../images/5.svg";
 
-interface TableDataItem {
-	column1: string;
-	column2: string;
-	column3: string;
-	column4: string;
 
-}
+
+
+
 
 const TableContainer = styled.div`
 	overflow-x: auto;
@@ -44,83 +50,105 @@ const Td = styled.td`
 	}
 `;
 
-
 const SpeedTest = () => {
-	const data: TableDataItem[] = [
-		{
-			column1: "Desktop",
-			column2: "60",
-			column3: "5",
-			column4: "5",
+	const [keyword, setKeyword] = useState<string>("");
+	const [load, setLoad] = useState<boolean>(false);
+	const user = useAppSelector((state) => state.currentUser);
+	const readSpeed = useAppSelector((state) => state.speed);
+	const dispatch = UseAppDispach();
+	const SearchSpeedNow = async () => {
+		setLoad(true);
+		await PageSpeedSearch(keyword, user?.data?._id, user?.token).then(
+			async (response: any) => {
+				setLoad(false);
+				console.log(response);
+				dispatch(SpeedTestData(response?.data));
+			},
+		);
+	};
+	if (load) return <LoadingComp />;
 
-		},
-		{
-			column1: "Mobile",
-			column2: "50",
-			column3: "6",
-			column4: "6",
+	return (
+		<Container>
+			<SiteHeader />
+			<Wrapper>
+				<Main
+					onSubmit={(e) => {
+						e.preventDefault();
+						SearchSpeedNow();
+					}}
+					
+					>
+					<InputText>Keyword</InputText>
+					<Input2>
+						<Input3
+							onChange={(e) => {
+								setKeyword(e.target.value);
+							}}
+							placeholder='eg. https://searchengineland.com'
+							type='url'
+						/>
 
-		}
-		// Add more data items as needed
-	];
-  return (
-      <Container>
-		  <SiteHeader />
-		   <Wrapper>
-			  
-					<Main>
-						<InputText>Keyword</InputText>
-						<Input2>
-							<Input3
-							
-								placeholder='Enter The Target'
-								type='search'
-							/>
+						<Button>Analyze</Button>
+					</Input2>
+				</Main>
+				<br />
+				<br />
+				<br />
+				{Object.keys(readSpeed).length === 0 && (
+					<div>
+						{" "}
+						<EmptyData
+							avatar={pic}
+							message='Enter Your Url in the Input Bar Above'
+						/>
+					</div>
+				)}
 
-							<Button>
-								Analyze
-							</Button>
-						</Input2>
-			  </Main>
-			  <br/>
-			  <br/>
-			  <br/>
-			  
-			  	<TableTitle>
-					<span>Speed Result</span>
-				</TableTitle>
-				<TableContainer>
-					<Table>
-						<thead>
-							<tr>
-								<Th>Device</Th>
-								<Th>Google  PageSpeed Score</Th>
-								<Th>Optimized</Th>
-								<Th>Improments</Th>
-								
-							</tr>
-						</thead>
-						<tbody>
-							{data.map((item, index) => (
-								<tr key={index}>
-									<Td>{item.column1}</Td>
-									<Td>{item.column2}</Td>
-									<Td>{item.column3}</Td>
-									<Td>{item.column4}</Td>
-									
-								</tr>
-							))}
-						</tbody>
-					</Table>
-				</TableContainer>
-		</Wrapper>
-         
-      </Container>
-  )
-}
+				{readSpeed?.status === "error" && (
+					<div>
+						<EmptyData
+							avatar={pic}
+							message='Sorry we couldnt find any result for this search.'
+						/>
+					</div>
+				)}
 
-export default SpeedTest
+				{readSpeed?.status === "ok" && (
+					<div>
+						<TableTitle>
+							<span>Speed Result</span>
+						</TableTitle>
+						<TableContainer>
+							<Table>
+								<thead>
+									<tr>
+										<Th>Device</Th>
+										<Th>Google PageSpeed Score</Th>
+										<Th>Optimized</Th>
+										<Th>Improments</Th>
+									</tr>
+								</thead>
+								<tbody>
+									{readSpeed?.data?.data[0]?.map((item: any, index: any) => (
+										<tr key={index}>
+											<Td>{item.Device}</Td>
+											<Td>{item["Google PageSpeed score"]}</Td>
+											<Td>{item["Optimized"]}</Td>
+											<Td>{item["Improvements"]}</Td>
+										</tr>
+									))}
+								</tbody>
+							</Table>
+						</TableContainer>
+					</div>
+				)}
+			</Wrapper>
+		</Container>
+	);
+};
 
+export default SpeedTest;
 
 const TableTitle = styled.div`
 	width: 100%;
@@ -139,8 +167,6 @@ const TableTitle = styled.div`
 	}
 `;
 
-
-
 const InputText = styled.div`
 	font-size: 12px;
 	margin-bottom: 3px;
@@ -157,7 +183,7 @@ const Input3 = styled.input`
 	font-family: Montserrat;
 `;
 
-const Main = styled.div`
+const Main = styled.form`
 	width: 100%;
 	margin-top: 10px;
 	margin-right: 40px;
@@ -195,9 +221,9 @@ const Button = styled.button`
 `;
 
 const Wrapper = styled.div`
-  margin-left: 25px;
-  margin-top: 10px;
-  /* width : 98% */
+	margin-left: 25px;
+	margin-top: 10px;
+	/* width : 98% */
 `;
 
 const Container = styled.div`

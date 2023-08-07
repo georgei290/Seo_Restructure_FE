@@ -51,7 +51,8 @@ const ContentTitle = () => {
 			column2: "Data 1",
 			column3: "Value 1",
 			column4: "value4",
-			column5: "SEO Content Editor \u2013 Keyword research and Content analysis made simple",
+			column5:
+				"SEO Content Editor \u2013 Keyword research and Content analysis made simple",
 		},
 		{
 			column1: "Row 2",
@@ -116,7 +117,6 @@ const ContentTitle = () => {
 									<br /> Number
 								</Th>
 								<Th>Title tag</Th>
-								
 							</tr>
 						</thead>
 						<tbody>

@@ -18,7 +18,7 @@ const HomeRoutes = () => {
 
 	useEffect(() => {
 		if (user?.email) {
-			navigate("/seochecker", { replace: true });
+			navigate("/seochecker/search", { replace: true });
 		}
 	}, [user]);
 
@@ -53,7 +53,7 @@ const HomeRoutes = () => {
 			element: <AfterRegister />,
 		},
 		{
-			path: "/:id/congrate-screen",
+			path: "/api/v1/:id/verified-user",
 			element: <CongrateComponent />,
 		},
 	]);

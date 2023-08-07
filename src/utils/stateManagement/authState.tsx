@@ -1,22 +1,24 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { PayloadAction } from "@reduxjs/toolkit/dist/createAction";
-import { iSign, User } from "../interfaces";
+import { iSign } from "../interfaces";
 
 const initialState = {
 	currentUser: {} as any | null,
-	googelData: {} as any,
-	businessData: {} as any | null,
-	onPageData: {} as any,
-	ContentSummaryData: {} as any,
-	contentSearchData: {} as any,
-	MainBusinessData: {} as any,
-	keywordData: {} as any,
-	keywordID: "",
-	baiduID: "",
-	naverID: "",
-	seznamID: "",
-	items: {} as any,
+	seoData: {} as any,
+	speed: {} as any,
+	header: {} as any,
 	backlink: {} as any,
+	pwa: {} as any,
+	research: {} as any,
+	difficulty: {} as any,
+	fast: {} as any,
+	density: {} as any,
+	links: {} as any,
+	rewrite: {} as any,
+	readability: {} as any,
+	word: {} as any,
+	age: {} as any,
+	items: {} as any,
 };
 
 const authState = createSlice({
@@ -27,55 +29,68 @@ const authState = createSlice({
 			state.currentUser = payload;
 		},
 
-		googelSearchData: (state, { payload }: PayloadAction) => {
-			state.googelData = payload;
+		SeoSearchData: (state, { payload }: PayloadAction<any>) => {
+			state.seoData = payload;
 		},
 
-		businessDataAPI: (state, { payload }: PayloadAction) => {
-			state.businessData = payload;
+		SpeedTestData: (state, { payload }: PayloadAction<any>) => {
+			state.speed = payload;
 		},
 
-		onPageAPI: (state, { payload }: PayloadAction) => {
-			state.onPageData = payload;
+		HeaderData: (state, { payload }: PayloadAction<any>) => {
+			state.header = payload;
 		},
 
-		storeBaiduId: (state, { payload }) => {
-			state.baiduID = payload;
+		PwaData: (state, { payload }: PayloadAction<any>) => {
+			state.pwa = payload;
 		},
 
-		storeNaverId: (state, { payload }) => {
-			state.naverID = payload;
+		ResearchData: (state, { payload }: PayloadAction<any>) => {
+			state.research = payload;
 		},
 
-		StoreseznamID: (state, { payload }) => {
-			state.seznamID = payload;
+		DifficultyData: (state, { payload }: PayloadAction<any>) => {
+			state.difficulty = payload;
 		},
 
-		StoreContentSummary: (state, { payload }) => {
-			state.ContentSummaryData = payload;
+		FastData: (state, { payload }: PayloadAction<any>) => {
+			state.fast = payload;
 		},
 
-		StoreContentSearch: (state, { payload }) => {
-			state.contentSearchData = payload;
+		densityData: (state, { payload }: PayloadAction<any>) => {
+			state.density = payload;
+		},
+
+		linkData: (state, { payload }: PayloadAction<any>) => {
+			state.links = payload;
+		},
+
+		rewriteData: (state, { payload }: PayloadAction<any>) => {
+			state.rewrite = payload;
+		},
+
+		readabilityData: (state, { payload }: PayloadAction<any>) => {
+			state.readability = payload;
+		},
+
+		wordData: (state, { payload }: PayloadAction<any>) => {
+			state.word = payload;
+		},
+
+		ageData: (state, { payload }: PayloadAction<any>) => {
+			state.age = payload;
 		},
 
 		storeItems: (state, { payload }) => {
 			state.items = payload;
 		},
-		StoreKeywordData: (state, { payload }) => {
-			state.keywordData = payload;
-		},
 
-		StorBusinessMain: (state, { payload }) => {
-			state.MainBusinessData = payload;
-		},
-
-		StoreBacklinkData: (state, { payload }: PayloadAction) => {
+		StoreBacklinkData: (state, { payload }: PayloadAction<any>) => {
 			state.backlink = payload;
 		},
 
 		clearData: (state) => {
-			state.googelData = null;
+			state.seoData = null;
 			// state.baiduID = "";
 			// state.naverID = "";
 			// state.seznamID = "";
@@ -83,9 +98,6 @@ const authState = createSlice({
 
 		logOut: (state) => {
 			state.currentUser = {};
-			state.googelData = {};
-			state.businessData = {};
-			state.onPageData = {};
 		},
 	},
 });
@@ -93,19 +105,25 @@ const authState = createSlice({
 export const {
 	loginUser,
 	logOut,
-	googelSearchData,
-	businessDataAPI,
-	onPageAPI,
-	storeBaiduId,
-	storeNaverId,
-	StoreseznamID,
+	SeoSearchData,
+	HeaderData,
+	PwaData,
+	FastData,
+	ageData,
+	wordData,
+	densityData,
+	readabilityData,
+	rewriteData,
+	linkData,
+	DifficultyData,
+	ResearchData,
+
 	clearData,
-	StoreContentSearch,
-	StoreContentSummary,
-	StorBusinessMain,
+
 	storeItems,
 	StoreBacklinkData,
-	StoreKeywordData,
+
+	SpeedTestData,
 } = authState.actions;
 
 export default authState.reducer;
