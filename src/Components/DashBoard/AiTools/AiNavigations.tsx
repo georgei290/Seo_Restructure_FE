@@ -17,9 +17,10 @@ const AiNavigations = () => {
 						justifyContent: "center",
 						display: "flex",
 						height: "100%",
+						marginLeft : "20px"
 					};
 				}}>
-				<nav>Text Rewritting</nav>
+				<nav> Ai Text Rewritting</nav>
 			</NavLink>
 
 			<NavLink

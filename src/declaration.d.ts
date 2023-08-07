@@ -6,3 +6,5 @@ declare module "*lodash";
 declare module "*react-icons";
 declare module "*react-content-loader";
 declare module "*@tanstack/react-query";
+declare module "*recharts";
+declare module "*react-router-dom";

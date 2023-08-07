@@ -40,12 +40,13 @@ const SignIn = () => {
 
 	const mutation = useMutation({
 		mutationKey: ["register"],
-		mutationFn: signinUser,
+		mutationFn: (data: any) => signinUser(data),
 
-		onSuccess: async (data) => {
+		onSuccess: (data) => {
+			console.log(data);
 			dispatch(loginUser(data));
 			setLoadingState(false);
-			navigate("/seochecker");
+			navigate("/seochecker/search");
 		},
 	});
 

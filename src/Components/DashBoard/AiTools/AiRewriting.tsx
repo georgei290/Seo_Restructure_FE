@@ -1,6 +1,17 @@
-import React from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
 import AiNavigations from "./AiNavigations";
+import LocData from "../../../utils/ReusedComp/Locations.json";
+import LangData from "../../../utils/ReusedComp/Languages.json";
+import LoadingComp from "../../../utils/ReusedComp/LoadingComp";
+import { AiRewrittingSearch } from "../../../utils/APICalls";
+import {
+	UseAppDispach,
+	useAppSelector,
+} from "../../../utils/stateManagement/store";
+import { rewriteData } from "../../../utils/stateManagement/authState";
+import EmptyData from "../../../utils/ReusedComp/EmptyData";
+import pic from "../images/5.svg";
 
 interface TableDataItem {
 	column1: string;
@@ -10,6 +21,7 @@ interface TableDataItem {
 
 const TableContainer = styled.div`
 	overflow-x: auto;
+	padding-bottom: 30px;
 `;
 
 const Table = styled.table`
@@ -43,80 +55,187 @@ const Td = styled.td`
 `;
 
 const AiRewritting = () => {
-	const data: TableDataItem[] = [
-		{
-			column1: "Row 1",
-			column2: "Data 1",
-			column3: "Value 1",
-		},
-		{
-			column1: "Row 2",
-			column2: "Data 2",
-			column3: "Value 2",
-		},
-		{
-			column1: "Row 3",
-			column2: "Data 3",
-			column3: "Value 3",
-		},
-		{
-			column1: "Row 3",
-			column2: "Data 3",
-			column3: "Value 3",
-		},
-		{
-			column1: "Row 3",
-			column2: "Data 3",
-			column3: "Value 3",
-		},
-		// Add more data items as needed
-	];
+	const [keyword, setKeyword] = useState<string>("");
+	const [load, setLoad] = useState<boolean>(false);
+	const [location, setLocation] = useState<string>("United States");
+	const [language, setLanguage] = useState<string>("English");
+
+	const user = useAppSelector((state) => state.currentUser);
+	const readData = useAppSelector((state) => state.rewrite);
+	const dispatch = UseAppDispach();
+	const SearchRewritingNow = async () => {
+		setLoad(true);
+		await AiRewrittingSearch(keyword, user?.data?._id, user?.token).then(
+			async (response: any) => {
+				setLoad(false);
+				// console.log(response);
+				dispatch(rewriteData(response?.data));
+			},
+		);
+	};
+	if (load) return <LoadingComp />;
+
 	return (
 		<Container>
 			<AiNavigations />
 			<Wrapper>
-				<Main>
-					<InputText>Search Keyword</InputText>
-					<Input2>
-						<Input3
-							// value={googleKeywords}
-							required={true}
-							placeholder='Enter search'
-							type='search'
+				<form
+					onSubmit={(e) => {
+						e.preventDefault();
+						SearchRewritingNow();
+					}}
+					>
+					<Main>
+						<InputHold>
+							<Main>
+								<InputText> Select Language</InputText>
+								<Select
+									required
+									onChange={(e) => {
+										setLanguage(e.target.value);
+									}}>
+									{LangData?.map((languages, i: number) => (
+										<option key={i} value={languages.value}>
+											{languages.name}
+										</option>
+									))}
+								</Select>
+							</Main>
+
+							<Main>
+								<InputText>Writing style</InputText>
+								<Select
+								// required
+								// onChange={(e) => {
+								// setLocation(e.target.value);
+								// }}
+								>
+									<option>Persuasive</option>
+								</Select>
+							</Main>
+
+							<Main>
+								<InputText>Tone of voice</InputText>
+								<Select
+								// required
+								// onChange={(e) => {
+								// setLocation(e.target.value);
+								// }}
+								>
+									<option>Assertive</option>
+								</Select>
+							</Main>
+
+							<Main>
+								<InputText>Audience</InputText>
+								<Select
+								// required
+								// onChange={(e) => {
+								// setLocation(e.target.value);
+								// }}
+								>
+									<option>0</option>
+								</Select>
+							</Main>
+						</InputHold>
+						<br />
+
+						<InputText>Search Keyword</InputText>
+						<Input2>
+							<Input3
+								onChange={(e) => {
+									setKeyword(e.target.value);
+								}}
+								// value={googleKeywords}
+								required={true}
+								placeholder='e.g Keyword difficulty is a SEO metric'
+								type='search'
+							/>
+							<Button>Search</Button>
+						</Input2>
+					</Main>
+				</form>
+				<br />
+				<br />
+
+				{Object.keys(readData).length === 0 && (
+					<div>
+						{" "}
+						<EmptyData
+							avatar={pic}
+							message='Enter Your keyword in the Input Bar Above'
 						/>
-						<Button>Search</Button>
-					</Input2>
-				</Main>
-				<br />
-				<br />
-				<TableTitle>
-					<span>Text Rewritting </span>
-				</TableTitle>
-				<TableContainer>
-					<Table>
-						<thead>
-							<tr>
-								<Th>#</Th>
-								<Th>Frequency</Th>
-							</tr>
-						</thead>
-						<tbody>
-							{data.map((item, index) => (
-								<tr key={index}>
-									<Td>{item.column1}</Td>
-									<Td>{item.column2}</Td>
-									<Td>{item.column3}</Td>
-								</tr>
-							))}
-						</tbody>
-					</Table>
-				</TableContainer>
+					</div>
+				)}
+				{readData?.status === "error" && (
+					<div>
+						<EmptyData
+							avatar={pic}
+							message='Sorry we couldnt find any result for this search.'
+						/>
+					</div>
+				)}
+
+				{readData?.status === "ok" && (
+					<>
+						<TableTitle>
+							<span>ai content rewriter </span>
+						</TableTitle>
+						<TableContainer>
+							<Table>
+								<thead>
+									<tr>
+										<Th>#</Th>
+										<Th>Ai Rewritter</Th>
+										<Th></Th>
+									</tr>
+								</thead>
+								<tbody>
+									{Object.keys(readData?.data).map((itemKey, index) => (
+										<tr key={index}>
+											<Td>{index + 1}</Td>
+											<Td style={{ fontWeight: "bold" }}>{itemKey}</Td>
+											<Td>{readData?.data[itemKey]}</Td>
+										</tr>
+									))}
+								</tbody>
+							</Table>
+						</TableContainer>
+					</>
+				)}
 			</Wrapper>
 		</Container>
 	);
 };
 
 export default AiRewritting;
+
+const Select = styled.select`
+	width: 100%;
+	height: 35px;
+	border-radius: 2px;
+	border: 1px solid #e2e2e2;
+	font-family: Montserrat;
+	outline: none;
+	padding-left: 10px;
+	margin-right: 10px;
+	::placeholder {
+		color: gray;
+	}
+	@media screen and (max-width: 768px) {
+		width: 100%;
+	}
+`;
+
+const InputHold = styled.div`
+	/* margin-top: 15px; */
+	width: 100%;
+	display: flex;
+
+	@media screen and (max-width: 768px) {
+		flex-wrap: wrap;
+	}
+`;
 
 const TableTitle = styled.div`
 	width: 100%;
@@ -177,7 +296,7 @@ const Button = styled.button`
 
 const Main = styled.div`
 	width: 100%;
-	margin-top: 10px;
+	/* margin-top: 10px; */
 	margin-right: 40px;
 `;
 

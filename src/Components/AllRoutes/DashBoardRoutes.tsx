@@ -1,15 +1,9 @@
 import { useRoutes } from "react-router-dom";
-import PrivateRoute from "../../utils/PrivateRoute";
+
 import {
 	BackLinkChecker,
-	BusinessData,
-	ContentAnalyzer,
-	Keywords,
-	OnPageData,
 	SeoChecker,
 	SeoSearchEngine,
-	DetaildOnpage,
-	KewWordTable,
 	AiTools,
 	SiteFlow,
 	MobileSupport,
@@ -25,6 +19,10 @@ import {
 	ContentMetatags,
 	ContentTitle,
 	ContentLinks,
+	MainKeywords,
+	KeyWordResearch,
+	DifficultySuggession,
+	KeywordFast,
 } from "./Bundled";
 
 const DashBoardRoutes = () => {
@@ -46,10 +44,6 @@ const DashBoardRoutes = () => {
 		{
 			path: "/backlinkchecker",
 			element: <BackLinkChecker />,
-		},
-		{
-			path: "/businessdata",
-			element: <BusinessData />,
 		},
 		{
 			path: "/contentanalyzer",
@@ -77,6 +71,30 @@ const DashBoardRoutes = () => {
 				{
 					path: "links",
 					element: <ContentLinks />,
+				},
+			],
+		},
+
+		{
+			path: "/keywords",
+			children: [
+				{
+					index: true,
+					element: <MainKeywords />,
+				},
+				{
+					path: "ai-keyword-research",
+					element: <KeyWordResearch />,
+				},
+
+				{
+					path: "suggestion-difficulty",
+					element: <DifficultySuggession />,
+				},
+
+				{
+					path: "suggestion-fast",
+					element: <KeywordFast />,
 				},
 			],
 		},
@@ -133,35 +151,6 @@ const DashBoardRoutes = () => {
 				{
 					path: "website-age",
 					element: <AiWebsiteAge />,
-				},
-			],
-		},
-
-		{
-			path: "/onpagedata",
-			children: [
-				{
-					index: true,
-					element: <OnPageData />,
-				},
-
-				{
-					path: "detail/:id",
-					element: <DetaildOnpage />,
-				},
-			],
-		},
-		{
-			path: "/keywords",
-			children: [
-				{
-					index: true,
-					element: <KewWordTable />,
-				},
-
-				{
-					path: ":id",
-					element: <Keywords />,
 				},
 			],
 		},

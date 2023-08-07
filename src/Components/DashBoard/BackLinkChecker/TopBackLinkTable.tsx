@@ -1,10 +1,8 @@
 import React from "react";
 import styled from "styled-components";
 
-interface TableDataItem {
-	column1: string;
-	column2: string;
-	column3: string;
+interface Iprops {
+	data: any;
 }
 
 const TableContainer = styled.div`
@@ -34,19 +32,29 @@ const Td = styled.td`
 	border-right: 1px solid #ddd;
 	white-space: pre-wrap;
 	word-wrap: break-word;
+	max-width: 300px;
 
 	&:last-child {
 		border-right: none;
 	}
 `;
 
-const TopBackLinkTable: React.FC = () => {
-	const data: TableDataItem[] = [
-		{ column1: "Row 1", column2: "Data 1", column3: "Value 1" },
-		{ column1: "Row 2", column2: "Data 2", column3: "Value 2" },
-		{ column1: "Row 3", column2: "Data 3", column3: "Value 3" },
-		// Add more data items as needed
-	];
+interface Iprops {
+	data: any;
+}
+
+const TopBackLinkTable: React.FC<Iprops> = ({ data }) => {
+	console.log("dayaya", data);
+
+	const mainData = data?.map((props: any) => {
+		return props?.Backlink;
+	});
+
+	console.log(
+		mainData?.map((prop: any) => {
+			return prop;
+		}),
+	);
 
 	return (
 		<div>
@@ -54,17 +62,32 @@ const TopBackLinkTable: React.FC = () => {
 				<Table>
 					<thead>
 						<tr>
-							<Th>Header 1</Th>
-							<Th>Header 2</Th>
-							<Th>Header 3</Th>
+							<Th>URL</Th>
+							<Th>
+								Domain
+								<br />
+								Authority
+							</Th>
+							<Th>
+								Page
+								<br />
+								Authority
+							</Th>
+
+							<Th>Anchor Text</Th>
+							<Th>Domain</Th>
 						</tr>
 					</thead>
 					<tbody>
-						{data.map((item, index) => (
+						{mainData?.map((item: any, index: any) => (
 							<tr key={index}>
-								<Td>{item.column1}</Td>
-								<Td>{item.column2}</Td>
-								<Td>{item.column3}</Td>
+								<Td>
+									<a href={item.URL}>{item.URL}</a>
+								</Td>
+								<Td>{item["Domain authority"]}</Td>
+								<Td>{item["Page authority"]}</Td>
+								<Td>{item["Anchor text"]}</Td>
+								<Td>{item["Domain"]}</Td>
 							</tr>
 						))}
 					</tbody>

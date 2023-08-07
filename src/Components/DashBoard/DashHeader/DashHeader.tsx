@@ -10,7 +10,7 @@ import { useSelector } from "react-redux";
 
 const DashHeader = () => {
   const [show, setShow] = useState(false);
-  const user = useSelector((state: any) => state.currentUser);
+  const user = useSelector((state: any) => state.currentUser?.data);
   const toggleShow = () => {
     setShow(!show);
   };

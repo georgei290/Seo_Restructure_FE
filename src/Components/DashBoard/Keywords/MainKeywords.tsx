@@ -2,42 +2,40 @@ import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import styled from "styled-components";
 
-const MainContent = () => {
+const MainKeyWords = () => {
 	const location = useLocation();
 	console.log(location);
 	return (
 		<Container>
 			<Wrapper>
-				<Title>Content Analyzer</Title>
+				<Title>Keyword Ranker</Title>
 				<SubTitle>
-					With On-Page API you can obtain a variety of on-page SEO data, which
-					you can use to eliminate hidden website errors and, consequently,
+					Content Analysis is the ultimate solution for building up brand
+					mention, sentiment analysis, and other content-related capabilities
 					<br />
 					boost rankings
 				</SubTitle>
 				<CardHold>
-					<MyLink to={`${location.pathname}/density`}>
+					<MyLink to={`${location.pathname}/aI-keyword-research`}>
 						<Card>
 							<Logo />
-							<Text>Keyword density</Text>
+							<Text>AI Keyword Research</Text>
 						</Card>
 					</MyLink>
-					{/* <MyLink to={`${location.pathname}/extract-metatags`}> */}
-						{/* <Card> */}
-							{/* <Logo /> */}
-							{/* <Text>Extract Metatags</Text> */}
-						{/* </Card> */}
-					{/* </MyLink> */}
-					{/* <MyLink to={`${location.pathname}/title-tags`}> */}
-						{/* <Card> */}
-							{/* <Logo /> */}
-							{/* <Text>Title Tag</Text> */}
-						{/* </Card> */}
-					{/* </MyLink> */}
-					<MyLink to={`${location.pathname}/links`}>
+					<MyLink to={`${location.pathname}/suggestion-difficulty`}>
 						<Card>
 							<Logo />
-							<Text>Links</Text>
+							<Text>
+								Keyword <br /> Suggestion / Difficulty
+							</Text>
+						</Card>
+					</MyLink>
+					<MyLink to={`${location.pathname}/suggestion-fast`}>
+						<Card>
+							<Logo />
+							<Text>
+								Keyword Suggestion <br /> (Fast)
+							</Text>
 						</Card>
 					</MyLink>
 				</CardHold>
@@ -46,7 +44,7 @@ const MainContent = () => {
 	);
 };
 
-export default MainContent;
+export default MainKeyWords;
 
 const MyLink = styled(Link)`
 	text-decoration: none;
@@ -56,6 +54,7 @@ const MyLink = styled(Link)`
 const Text = styled.div`
 	font-weight: 700;
 	font-size: 17px;
+	text-align: center;
 `;
 
 const Logo = styled.img`

@@ -1,141 +1,120 @@
-import React from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
 import AiNavigations from "./AiNavigations";
-
-interface TableDataItem {
-	column1: string;
-	column2: string;
-	column3: string;
-}
-
-const TableContainer = styled.div`
-	overflow-x: auto;
-`;
-
-const Table = styled.table`
-	width: 100%;
-	border-collapse: collapse;
-	background-color: white;
-	overflow-x: scroll;
-
-	tbody > tr:nth-child(odd) {
-		background-color: #fafafc;
-	}
-`;
-
-const Th = styled.th`
-	padding: 8px;
-	text-align: left;
-	border-bottom: 1px solid #ddd;
-	border-right: 1px solid #ddd;
-`;
-
-const Td = styled.td`
-	padding: 8px;
-	text-align: left;
-	border-right: 1px solid #ddd;
-	white-space: pre-wrap;
-	word-wrap: break-word;
-
-	&:last-child {
-		border-right: none;
-	}
-`;
+import LoadingComp from "../../../utils/ReusedComp/LoadingComp";
+import {
+	UseAppDispach,
+	useAppSelector,
+} from "../../../utils/stateManagement/store";
+import { AiWordCount } from "../../../utils/APICalls";
+import { wordData } from "../../../utils/stateManagement/authState";
+import EmptyData from "../../../utils/ReusedComp/EmptyData";
+import pic from "../images/5.svg";
 
 const AiWorldCounts = () => {
-	const data: TableDataItem[] = [
-		{
-			column1: "Row 1",
-			column2: "Data 1",
-			column3: "Value 1",
-		},
-		{
-			column1: "Row 2",
-			column2: "Data 2",
-			column3: "Value 2",
-		},
-		{
-			column1: "Row 3",
-			column2: "Data 3",
-			column3: "Value 3",
-		},
-		{
-			column1: "Row 3",
-			column2: "Data 3",
-			column3: "Value 3",
-		},
-		{
-			column1: "Row 3",
-			column2: "Data 3",
-			column3: "Value 3",
-		},
-		// Add more data items as needed
-	];
+	const [keyword, setKeyword] = useState<string>("");
+	const [load, setLoad] = useState<boolean>(false);
+	const user = useAppSelector((state) => state.currentUser);
+	const readData = useAppSelector((state) => state.word);
+	const dispatch = UseAppDispach();
+	const SearchWordNow = async () => {
+		setLoad(true);
+		await AiWordCount(keyword, user?.data?._id, user?.token).then(
+			async (response: any) => {
+				setLoad(false);
+				console.log(response);
+				dispatch(wordData(response?.data));
+			},
+		);
+	};
+	if (load) return <LoadingComp />;
+
 	return (
 		<Container>
 			<AiNavigations />
 			<Wrapper>
-				<Main>
+				<Main
+					onSubmit={(e) => {
+						e.preventDefault();
+						SearchWordNow();
+					}}>
 					<InputText>Search Keyword</InputText>
 					<Input2>
 						<Input3
+							onChange={(e) => {
+								setKeyword(e.target.value);
+							}}
 							// value={googleKeywords}
 							required={true}
-							placeholder='Enter search'
-							type='search'
+							placeholder='e.g https://searchengineland.com'
+							type='url'
 						/>
 						<Button>Search</Button>
 					</Input2>
 				</Main>
-				<MiddleBox>
-					<InnerMidBox bb='1px solid red'>
-						<InnerTitle>Item Count</InnerTitle>
-						<InnerSub>0</InnerSub>
-					</InnerMidBox>
-					<InnerMidBox bb='1px solid green'>
-						<InnerTitle>Page Type</InnerTitle>
-						<InnerSub>0</InnerSub>
-					</InnerMidBox>
-					<InnerMidBox bb='1px solid yellow'>
-						<InnerTitle>Page Type</InnerTitle>
-						<InnerSub>0</InnerSub>
-					</InnerMidBox>
-					<InnerMidBox bb='1px solid blue'>
-						<InnerTitle>Page Type</InnerTitle>
-						<InnerSub>0</InnerSub>
-					</InnerMidBox>
-				</MiddleBox>
+
+				{Object.keys(readData).length === 0 && (
+					<div>
+						{" "}
+						<EmptyData
+							avatar={pic}
+							message='Enter Your keyword in the Input Bar Above'
+						/>
+					</div>
+				)}
+				{readData?.status === "error" && (
+					<div>
+						<EmptyData
+							avatar={pic}
+							message='Sorry we couldnt find any result for this search.'
+						/>
+					</div>
+				)}
+
 				<br />
 				<br />
-				<TableTitle>
-					<span>World Count </span>
-				</TableTitle>
-				<TableContainer>
-					<Table>
-						<thead>
-							<tr>
-								<Th>#</Th>
-								<Th>Frequency</Th>
-							</tr>
-						</thead>
-						<tbody>
-							{data.map((item, index) => (
-								<tr key={index}>
-									<Td>{item.column1}</Td>
-									<Td>{item.column2}</Td>
-									<Td>{item.column3}</Td>
-								</tr>
-							))}
-						</tbody>
-					</Table>
-				</TableContainer>
+
+				{readData?.status === "ok" && (
+					<MiddleBox>
+						<InnerMidBox bb='1px solid red'>
+							<InnerTitle>Word count total</InnerTitle>
+							<InnerSub>
+								{readData?.data?.data &&
+									readData?.data?.data[0]["Word count total"]}
+							</InnerSub>
+						</InnerMidBox>
+						<InnerMidBox bb='1px solid green'>
+							<InnerTitle>Corrected word count</InnerTitle>
+							<InnerSub>
+								{readData?.data?.data &&
+									readData?.data?.data[0]["Corrected word count"]}
+							</InnerSub>
+						</InnerMidBox>
+						<InnerMidBox bb='1px solid yellow'>
+							<InnerTitle>Anchor text words</InnerTitle>
+							<InnerSub>
+								{readData?.data?.data &&
+									readData?.data?.data[0]["Anchor text words"]}
+							</InnerSub>
+						</InnerMidBox>
+						<InnerMidBox bb='1px solid blue'>
+							<InnerTitle>Anchor Percentage</InnerTitle>
+							<InnerSub>
+								{readData?.data?.data &&
+									readData?.data?.data[0]["Anchor Percentage"]}
+							</InnerSub>
+						</InnerMidBox>
+					</MiddleBox>
+				)}
+
+				<br />
+				<br />
 			</Wrapper>
 		</Container>
 	);
 };
 
 export default AiWorldCounts;
-
 
 const MiddleBox = styled.div`
 	display: flex;
@@ -159,7 +138,6 @@ const InnerSub = styled.div`
 	font-size: 25px;
 	font-weight: 800;
 `;
-
 
 const TableTitle = styled.div`
 	width: 100%;
@@ -218,7 +196,7 @@ const Button = styled.button`
 	}
 `;
 
-const Main = styled.div`
+const Main = styled.form`
 	width: 100%;
 	margin-top: 10px;
 	margin-right: 40px;

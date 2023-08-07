@@ -1,73 +1,129 @@
-import React from 'react'
-import styled from 'styled-components'
-import SiteHeader from './SiteHeader'
-import SiteResultTable from './SiteResultTable'
-import SiteWorldTable from "./SiteWorldTable"
+import React, { useState } from "react";
+import styled from "styled-components";
+import SiteHeader from "./SiteHeader";
+import SiteResultTable from "./SiteResultTable";
+import LoadingComp from "../../../utils/ReusedComp/LoadingComp";
+import {
+	UseAppDispach,
+	useAppSelector,
+} from "../../../utils/stateManagement/store";
+import { PWASearch } from "../../../utils/APICalls";
+import { PwaData } from "../../../utils/stateManagement/authState";
+import EmptyData from "../../../utils/ReusedComp/EmptyData";
+import pic from "../images/5.svg";
 
 const Pwa = () => {
-  return (
-    <Container>
-        <SiteHeader/>
-           <Wrapper>
-			  
-					<Main>
-						<InputText>Keyword</InputText>
-						<Input2>
-							<Input3
-							
-								placeholder='Enter The Target'
-								type='search'
-							/>
+	const [keyword, setKeyword] = useState<string>("");
+	const [load, setLoad] = useState<boolean>(false);
+	const user = useAppSelector((state) => state.currentUser);
+	const readPwa = useAppSelector((state) => state.pwa);
+	const dispatch = UseAppDispach();
+	const SearchPwaNow = async () => {
+		setLoad(true);
+		await PWASearch(keyword, user?.data?._id, user?.token).then(
+			async (response: any) => {
+				setLoad(false);
+				console.log(response);
+				dispatch(PwaData(response?.data));
+			},
+		);
+	};
+	if (load) return <LoadingComp />;
+	return (
+		<Container>
+			<SiteHeader />
+			<Wrapper>
+				<Main
+					onSubmit={(e) => {
+						e.preventDefault();
+						SearchPwaNow();
+					}}>
+					<InputText>Keyword</InputText>
+					<Input2>
+						<Input3
+						required
+							onChange={(e) => {
+								setKeyword(e.target.value);
+							}}
+							placeholder='eg. https://searchengineland.com'
+							type='url'
+						/>
 
-							<Button>
-								Analyze
-							</Button>
-						</Input2>
-			  </Main>
-			  
-			  <DownData>
+						<Button type='submit'>Analyze</Button>
+					</Input2>
+				</Main>
+
+				<DownData>
+					{Object.keys(readPwa).length === 0 && (
+						<div>
+							{" "}
+							<EmptyData
+								avatar={pic}
+								message='Enter Your Url in the Input Bar Above'
+							/>
+						</div>
+					)}
+					{readPwa?.status === "error" && (
+						<div>
+							<EmptyData
+								avatar={pic}
+								message='Sorry we couldnt find any result for this search.'
+							/>
+						</div>
+					)}
+
 					{/* <EmptyData avatar={pic} message='No result found' /> */}
 
-					<CardHold>
-						<Card>
-							<TitleCard>Device</TitleCard>
-							<Count>Mobile</Count>
-						</Card>
-						<Card>
-							<TitleCard>Google PWA Score</TitleCard>
-							<Count>25</Count>
-						</Card>
-						<Card>
-							<TitleCard>Optimized</TitleCard>
-							<Count>04</Count>
-						</Card>
-						<Card>
-							<TitleCard>Improvements</TitleCard>
-							<Count>10</Count>
-						</Card>
-					</CardHold>
-
-					<TableTitle>
-						<span>Google PWA Score </span>
-					</TableTitle>
-					<SiteResultTable />
-					<br/>
-					<br/>
-
-					{/* <TableTitle>
-						<span>SERP Analyzer Data </span>
-					</TableTitle>
-					<SiteWorldTable /> */}
-
-				
+					{readPwa?.status === "ok" && (
+						<>
+							<CardHold>
+								<Card>
+									<TitleCard>Device</TitleCard>
+									<Count>
+										{readPwa?.data?.data && readPwa?.data?.data[0]?.Device}
+									</Count>
+								</Card>
+								<Card>
+									<TitleCard>Google PWA Score</TitleCard>
+									<Count>
+										{readPwa?.data?.data &&
+											readPwa?.data?.data[0]["Google PWA Score"]}
+									</Count>
+								</Card>
+								<Card>
+									<TitleCard>Optimized</TitleCard>
+									<Count>
+										{readPwa?.data?.data && readPwa?.data?.data[0]["Optimized"]}
+									</Count>
+								</Card>
+								<Card>
+									<TitleCard>Improvements</TitleCard>
+									<Count>
+										{readPwa?.data?.data &&
+											readPwa?.data?.data[0]["Improvements"]}
+									</Count>
+								</Card>
+							</CardHold>
+							<TableTitle>
+								<span>Google PWA Score </span>
+							</TableTitle>
+							<SiteResultTable
+								data={
+									readPwa?.data?.data &&
+									readPwa?.data?.data[1]
+								}
+							/>
+							<br />
+							<br />
+						</>
+					)}
 				</DownData>
-		</Wrapper>
-      </Container>
-  )
-}
+			</Wrapper>
+		</Container>
+	);
+};
 
-export default Pwa
-
+export default Pwa;
 
 const TitleCard = styled.div`
 	color: black;
@@ -144,8 +200,6 @@ const Title = styled.div`
 	font-weight: 800;
 `;
 
-
-
 const InputText = styled.div`
 	font-size: 12px;
 	margin-bottom: 3px;
@@ -162,7 +216,7 @@ const Input3 = styled.input`
 	font-family: Montserrat;
 `;
 
-const Main = styled.div`
+const Main = styled.form`
 	width: 100%;
 	margin-top: 10px;
 	margin-right: 40px;
@@ -200,9 +254,9 @@ const Button = styled.button`
 `;
 
 const Wrapper = styled.div`
-  margin-left: 25px;
-  margin-top: 10px;
-  /* width : 98% */
+	margin-left: 25px;
+	margin-top: 10px;
+	/* width : 98% */
 `;
 const Container = styled.div`
 	width: calc(100vw - 240px);

@@ -1,10 +1,10 @@
 import React from "react";
 import styled from "styled-components";
 
-interface TableDataItem {
-	column1: string;
-	column2: string;
-	column3: string;
+interface Iprops {
+	data : any
+	
+	
 }
 
 const TableContainer = styled.div`
@@ -42,17 +42,17 @@ const Td = styled.td`
 
 `;
 
-const SiteResultTable: React.FC = () => {
-	const data: TableDataItem[] = [
-		{
-			column1: "Is not configured for a custom splash sc...",
-			column2: "Copy A themed splash screen ensures a high-quality experience when users launch your app from their homescreens.",
-			column3: "negative"
-		},
-		{ column1: "Row 2", column2: "Data 2", column3: "Value 2" },
-		{ column1: "Row 3", column2: "Data 3", column3: "Value 3" },
-		// Add more data items as needed
-	];
+const SiteResultTable: React.FC<Iprops> = ({data}) => {
+	
+	
+	
+
+
+	
+	
+	
+	
+	
 
 	return (
 		<div>
@@ -66,16 +66,16 @@ const SiteResultTable: React.FC = () => {
 						</tr>
 					</thead>
 					<tbody>
-						{data.map((item, index) => (
+						{data.map((item:any, index:any) => (
 							<tr key={index}>
-								<Td>{item.column1}</Td>
+								<Td>{item.Title}</Td>
 								<Td>
 									<div>
-										{item.column2}
+										{item.Feedback}
 									</div>
 									
 								</Td>
-								<Td>{item.column3}</Td>
+								<Td>{item.Status}</Td>
 							</tr>
 						))}
 					</tbody>

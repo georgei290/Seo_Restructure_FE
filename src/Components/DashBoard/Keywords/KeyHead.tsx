@@ -6,12 +6,12 @@ import { MdSnippetFolder } from "react-icons/md";
 import { FaShopware } from "react-icons/fa";
 import { NavLink, useNavigate } from "react-router-dom";
 
-const SiteHeader = () => {
+const KeyHead = () => {
 	return (
 		<Container>
 			<NavBack>
 				<NavCon>
-					<NavLinkStyled to='/siteflow/mobile-support'>
+					<NavLinkStyled to='/keywords/aI-keyword-research'>
 						<FirstNav>
 							<div>
 								<BsFillPhoneFill
@@ -21,10 +21,10 @@ const SiteHeader = () => {
 									}}
 								/>
 							</div>
-							<p>Mobile support Test</p>
+							<p>Ai Keyword Research</p>
 						</FirstNav>
 					</NavLinkStyled>
-					<NavLinkStyled to='/siteflow/speed-test'>
+					<NavLinkStyled to='/keywords/suggestion-difficulty'>
 						<FirstNav>
 							<div>
 								<AiFillDashboard
@@ -35,11 +35,11 @@ const SiteHeader = () => {
 									}}
 								/>
 							</div>
-							<p>Speed Test</p>
+							<p>Difficult/Suggession</p>
 						</FirstNav>
 					</NavLinkStyled>
 
-					<NavLinkStyled to='/siteflow/headers'>
+					<NavLinkStyled to='/keywords/suggestion-fast'>
 						<FirstNav>
 							<div>
 								<MdSnippetFolder
@@ -50,21 +50,7 @@ const SiteHeader = () => {
 									}}
 								/>
 							</div>
-							<p>Header</p>
-						</FirstNav>
-					</NavLinkStyled>
-					<NavLinkStyled to='/siteflow/pwa'>
-						<FirstNav>
-							<div>
-								<FaShopware
-									style={{
-										fontSize: "22px",
-										marginTop: "10px",
-										marginRight: "5px",
-									}}
-								/>
-							</div>
-							<p>PWA</p>
+							<p> Suggestion (Fast)</p>
 						</FirstNav>
 					</NavLinkStyled>
 				</NavCon>
@@ -85,7 +71,7 @@ const SiteHeader = () => {
 	);
 };
 
-export default SiteHeader;
+export default KeyHead;
 
 const NavLinkStyled = styled(NavLink)`
 	color: black;

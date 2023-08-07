@@ -6,33 +6,42 @@ import { useDispatch, useSelector } from "react-redux";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { useForm, SubmitHandler } from "react-hook-form";
-import { BacklinkSearchData } from "../../../utils/APICalls";
 import { StoreBacklinkData } from "../../../utils/stateManagement/authState";
 import pix1 from "../images/share.svg";
 import TopBackLinkTable from "./TopBackLinkTable";
 import LostBackLinkTable from "./LostBackLinkTable";
+import { BackLinkSearch } from "../../../utils/APICalls";
+import LoadingComp from "../../../utils/ReusedComp/LoadingComp";
+import { useAppSelector } from "../../../utils/stateManagement/store";
 interface iSearch {
-	keywords: string;
+	keyword: string;
 }
 
-const ViewingBacklink = (props: any) => {
+const ViewingBacklink = () => {
 	const user = useSelector((state: any) => state.currentUser);
+	const readBacklinks = useAppSelector((state) => state.backlink);
 
 	const [load, setLoad] = useState(false);
 	const dispatch = useDispatch();
 	const schema = yup.object().shape({
-		keywords: yup.string().required("please enter a valid search word"),
+		keyword: yup.string().required("please enter a valid search word"),
 	});
 	const { handleSubmit, register } = useForm<iSearch>({
 		resolver: yupResolver(schema),
 	});
-	const onSubmit: SubmitHandler<iSearch> = async (keywords: any) => {
+	const onSubmit: SubmitHandler<iSearch> = async (keyword: any) => {
 		setLoad(true);
 
+		console.log(keyword);
+
 		try {
-			const res = await BacklinkSearchData(keywords, user?._id);
-			dispatch(StoreBacklinkData(res?.data));
-			setLoad(false);
+			await BackLinkSearch(keyword, user?.data?._id, user?.token).then(
+				(response) => {
+					console.log(response);
+					dispatch(StoreBacklinkData(response));
+					setLoad(false);
+				},
+			);
 		} catch (err) {
 			setLoad(false);
 			throw err;
@@ -40,6 +49,9 @@ const ViewingBacklink = (props: any) => {
 			setLoad(false);
 		}
 	};
+
+	if (load) return <LoadingComp />;
+
 	return (
 		<div>
 			<div>
@@ -50,8 +62,10 @@ const ViewingBacklink = (props: any) => {
 								<InputText>BackLinks Data Search</InputText>
 								<Input2 onSubmit={handleSubmit(onSubmit)}>
 									<Input3
-										placeholder='eg. www.google.com'
-										{...register("keywords")}
+										type='url'
+										required
+										placeholder='eg. https://google.com'
+										{...register("keyword")}
 									/>
 									<Button type='submit'>Search Backlink</Button>
 								</Input2>
@@ -60,45 +74,55 @@ const ViewingBacklink = (props: any) => {
 					</>
 				</HolderForm>
 
-				<div>
-					<hr />
-					<MainHolder>
-						<ShaerImage src={pix1} alt='image for default backlink checker' />
-						<Br />
-						<SubTitle>
-							Monitor backlink performance for yourself and competitors.
-						</SubTitle>
-					</MainHolder>
-				</div>
+				<hr />
+				{Object.entries(readBacklinks)?.length === 0 ? (
+					<>
+						<MainHolder>
+							<ShaerImage src={pix1} alt='image for default backlink checker' />
+							<Br />
+							<SubTitle>
+								Monitor backlink performance for yourself and competitors.
+							</SubTitle>
+						</MainHolder>
+					</>
+				) : (
+					<>
+						<hr />
+						<br />
 
-				<>
-					<hr />
-					<br />
+						<BacklinkDetailed
+							summary={readBacklinks}
+							// summary={getBacklinks["SummaryData"][0]["result"][0]}
+						/>
 
-					<BacklinkDetailed
-					// summary={getBacklinks["SummaryData"][0]["result"][0]}
-					/>
+						<br />
 
-					<br />
+						{/* <BacklinkLevel /> */}
 
-					<BacklinkLevel
-					// summary={getBacklinks["SummaryData"][0]["result"][0]}
-					/>
+						<br />
 
-					<br />
+						<TableTitle>
+							<span>Top BackLink </span>
+						</TableTitle>
+						{readBacklinks && (
+							<TopBackLinkTable
+								data={readBacklinks?.topBackLinkData?.data?.data}
+							/>
+						)}
 
-					<TableTitle>
-						<span>Top BackLink </span>
-					</TableTitle>
-					<TopBackLinkTable />
-					<br />
-					<br />
+						<br />
+						<br />
 
-					<TableTitle>
-						<span>Lost BackLink </span>
-					</TableTitle>
-					<LostBackLinkTable />
-				</>
+						<TableTitle>
+							<span>Lost BackLink </span>
+						</TableTitle>
+						{readBacklinks && (
+							<LostBackLinkTable
+								data={readBacklinks?.lostBacklinkData?.data?.data}
+							/>
+						)}
+					</>
+				)}
 			</div>
 		</div>
 	);

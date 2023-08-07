@@ -1,17 +1,19 @@
-import React from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
 import AiNavigations from "./AiNavigations";
-
-interface TableDataItem {
-	column1: string;
-	column2: string;
-	column3: string;
-	column4: string;
-	column5: string;
-}
+import LoadingComp from "../../../utils/ReusedComp/LoadingComp";
+import {
+	UseAppDispach,
+	useAppSelector,
+} from "../../../utils/stateManagement/store";
+import { AiRedabilityScore } from "../../../utils/APICalls";
+import { readabilityData } from "../../../utils/stateManagement/authState";
+import EmptyData from "../../../utils/ReusedComp/EmptyData";
+import pic from "../images/5.svg";
 
 const TableContainer = styled.div`
 	overflow-x: auto;
+	padding-bottom: 30px;
 `;
 
 const Table = styled.table`
@@ -45,170 +47,178 @@ const Td = styled.td`
 `;
 
 const AiReadability = () => {
-	const data: TableDataItem[] = [
-		{
-			column1: "https://www.seoreviewtools.com/seo-content-editor",
-			column2: "Data 1",
-			column3: "Value 1",
-			column4: "value4",
-			column5: "Search Engine Land",
-		},
-		{
-			column1: "Row 2",
-			column2: "Data 2",
-			column3: "Value 2",
-			column4: "value4",
-			column5: "value5",
-		},
-		{
-			column1: "Row 3",
-			column2: "Data 3",
-			column3: "Value 3",
-			column4: "value4",
-			column5: "value5",
-		},
-		{
-			column1: "Row 3",
-			column2: "Data 3",
-			column3: "Value 3",
-			column4: "value4",
-			column5: "value5",
-		},
-		{
-			column1: "Row 3",
-			column2: "Data 3",
-			column3: "Value 3",
-			column4: "value4",
-			column5: "value5",
-		},
-		// Add more data items as needed
-	];
+	const [keyword, setKeyword] = useState<string>("");
+	const [load, setLoad] = useState<boolean>(false);
+
+	const user = useAppSelector((state) => state.currentUser);
+	const readData = useAppSelector((state) => state.readability);
+	const dispatch = UseAppDispach();
+	const SearchReadabilityNow = async () => {
+		setLoad(true);
+		await AiRedabilityScore(keyword, user?.data?._id, user?.token).then(
+			async (response: any) => {
+				setLoad(false);
+				console.log(response);
+				dispatch(readabilityData(response?.data));
+			},
+		);
+	};
+	if (load) return <LoadingComp />;
 	return (
 		<Container>
 			<AiNavigations />
 			<Wrapper>
-				<Main>
+				<Main
+					onSubmit={(e) => {
+						e.preventDefault();
+						SearchReadabilityNow();
+					}}>
 					<InputText>Search Keyword</InputText>
 					<Input2>
 						<Input3
+							onChange={(e) => {
+								setKeyword(e.target.value);
+							}}
 							// value={googleKeywords}
 							required={true}
-							placeholder='Enter search'
-							type='search'
+							placeholder='e.g https://www.seoreviewtools.com/valuable-backlinks-checker'
+							type='url'
 						/>
 						<Button>Search</Button>
 					</Input2>
 				</Main>
 
-				<BoxesDiv>
-					<MiddleBox>
-						<InnerMidBox>
-							<InnerTitle>Item Count</InnerTitle>
-							<InnerSub>0</InnerSub>
-						</InnerMidBox>
-						<InnerMidBox>
-							<InnerTitle>Page Type</InnerTitle>
-							<InnerSub>0</InnerSub>
-						</InnerMidBox>
-					</MiddleBox>
-					<MainBox>
-						<TopBox>
-							<Toptitle>Analysis Data</Toptitle>
-							<TopSub>0</TopSub>
-						</TopBox>
-						<ButtomBoxHold>
-							<TomBox>
-								<ButtomTitle>Blogs</ButtomTitle>
-								<TomSub>0</TomSub>
-							</TomBox>
-							<TomBox>
-								<ButtomTitle>Ecomerce</ButtomTitle>
-								<TomSub>0</TomSub>
-							</TomBox>
-							<TomBox>
-								<ButtomTitle>News</ButtomTitle>
-								<TomSub>0</TomSub>
-							</TomBox>
-						</ButtomBoxHold>
-					</MainBox>
+				{Object.keys(readData).length === 0 && (
+					<div>
+						{" "}
+						<EmptyData
+							avatar={pic}
+							message='Enter Your keyword in the Input Bar Above'
+						/>
+					</div>
+				)}
+				{readData?.status === "error" && (
+					<div>
+						<EmptyData
+							avatar={pic}
+							message='Sorry we couldnt find any result for this search.'
+						/>
+					</div>
+				)}
 
-					<MiddleBox>
-						<InnerMidBox>
-							<InnerTitle>Item Count</InnerTitle>
-							<InnerSub>0</InnerSub>
-						</InnerMidBox>
-						<InnerMidBox>
-							<InnerTitle>Page Type</InnerTitle>
-							<InnerSub>0</InnerSub>
-						</InnerMidBox>
-					</MiddleBox>
-				</BoxesDiv>
+				{readData?.status === "ok" && (
+					<BoxesDiv>
+						<MiddleBox>
+							<InnerMidBox style={{ borderBottom: "2px solid #283618" }}>
+								<InnerTitle>Paragraph</InnerTitle>
+								<InnerSub>
+									{readData?.data && readData?.data?.data?.Paragraphs}
+								</InnerSub>
+							</InnerMidBox>
+							<InnerMidBox style={{ borderBottom: "2px solid #00AFB9" }}>
+								<InnerTitle>Sentences</InnerTitle>
+								<InnerSub>
+									{" "}
+									{readData?.data && readData?.data?.data?.Sentences}
+								</InnerSub>
+							</InnerMidBox>
+						</MiddleBox>
+						<MainBox>
+							<TopBox style={{ borderBottom: "2px solid #FAA307" }}>
+								<div>
+									<Toptitle>Reading time</Toptitle>
+									<TopSub>
+										{" "}
+										{readData?.data && readData?.data?.data["Reading time"]}
+									</TopSub>
+								</div>
+
+								<div>
+									<Toptitle>Analysis Data</Toptitle>
+									<TopSub>
+										{" "}
+										{readData?.data && readData?.data?.data["Speaking time"]}
+									</TopSub>
+								</div>
+								<div>
+									<Toptitle>avg. word length</Toptitle>
+									<TopSub>
+										{" "}
+										{readData?.data && readData?.data?.data["avg. word length"]}
+									</TopSub>
+								</div>
+								<div>
+									<Toptitle>avg. sentence length</Toptitle>
+									<TopSub>
+										{" "}
+										{readData?.data &&
+											readData?.data?.data["avg. sentence length"]}
+									</TopSub>
+								</div>
+							</TopBox>
+						</MainBox>
+						<MiddleBox>
+							<InnerMidBox style={{ borderBottom: "2px solid #8ECAE6" }}>
+								<InnerTitle>Words</InnerTitle>
+								<InnerSub>
+									{readData?.data && readData?.data?.data?.Words}
+								</InnerSub>
+							</InnerMidBox>
+							<InnerMidBox style={{ borderBottom: "2px solid #6A4C93" }}>
+								<InnerTitle>Characters</InnerTitle>
+								<InnerSub>
+									{" "}
+									{readData?.data && readData?.data?.data?.Characters}
+								</InnerSub>
+							</InnerMidBox>
+						</MiddleBox>
+					</BoxesDiv>
+				)}
 
 				<br />
 				<br />
-				<TableTitle>
-					<span>Readability Score </span>
-				</TableTitle>
-				<TableContainer>
-					<Table>
-						<thead>
-							<tr>
-								<Th>Url</Th>
-								<Th>Link type</Th>
-								<Th>Nofollow </Th>
-								<Th>
-									Anchor
-									<br /> type
-								</Th>
-								<Th>Anchor text</Th>
-							</tr>
-						</thead>
-						<tbody>
-							{data.map((item, index) => (
-								<tr key={index}>
-									<Td>{item.column1}</Td>
-									<Td>{item.column2}</Td>
-									<Td>{item.column3}</Td>
-									<Td>{item.column4}</Td>
-									<Td>{item.column5}</Td>
-								</tr>
-							))}
-						</tbody>
-					</Table>
-				</TableContainer>
+
+				{readData?.status === "ok" && (
+					<>
+						<TableTitle>
+							<span>Readability </span>
+						</TableTitle>
+						<TableContainer>
+							<Table>
+								<thead>
+									<tr>
+										<Th>#</Th>
+										<Th>Flesch Kincaid Reading Ease</Th>
+										<Th></Th>
+									</tr>
+								</thead>
+								<tbody>
+									{Object.keys(
+										readData?.data?.data["Flesch Kincaid Reading Ease"],
+									).map((itemKey, index) => (
+										<tr key={index}>
+											<Td>{index + 1}</Td>
+											<Td style={{ fontWeight: "bold" }}>{itemKey}</Td>
+											<Td>
+												{
+													readData?.data?.data["Flesch Kincaid Reading Ease"][
+														itemKey
+													]
+												}
+											</Td>
+										</tr>
+									))}
+								</tbody>
+							</Table>
+						</TableContainer>
+					</>
+				)}
 			</Wrapper>
 		</Container>
 	);
 };
 
 export default AiReadability;
-
-const RateBar = styled.div`
-	height: 6px;
-	width: 100%;
-	background-color: #f49867;
-	margin-bottom: 15px;
-	border-radius: 10px;
-`;
-const RateBar2 = styled.div`
-	width: 70%;
-	height: 6px;
-	border-radius: 10px;
-	background-color: #ae67fa;
-`;
-const MainTop = styled.div``;
-const MainButtom = styled.div``;
-const RateBox = styled.div``;
-const RateData = styled.div`
-	display: flex;
-	justify-content: space-between;
-`;
-const DataRate = styled.div``;
-const RateTitle = styled.div`
-	font-size: 9px;
-	font-weight: 600;
-	margin-bottom: 15px;
-`;
 
 const BoxesDiv = styled.div`
 	width: 100%;
@@ -226,7 +236,11 @@ const MainBox = styled.div`
 	flex-direction: column;
 	justify-content: space-between;
 `;
-const TopBox = styled.div``;
+const TopBox = styled.div`
+	display: flex;
+	justify-content: space-between;
+	flex-wrap: wrap;
+`;
 
 const Toptitle = styled.div`
 	font-size: 13px;
@@ -236,6 +250,7 @@ const Toptitle = styled.div`
 const TopSub = styled.div`
 	font-size: 25px;
 	font-weight: 800;
+	padding-bottom: 40px;
 `;
 const ButtomBoxHold = styled.div`
 	display: flex;
@@ -327,7 +342,7 @@ const Button = styled.button`
 	}
 `;
 
-const Main = styled.div`
+const Main = styled.form`
 	width: 100%;
 	margin-top: 10px;
 	margin-right: 40px;

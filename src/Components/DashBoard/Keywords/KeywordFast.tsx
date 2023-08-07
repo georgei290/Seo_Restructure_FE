@@ -1,29 +1,64 @@
 import React, { useState } from "react";
 import styled from "styled-components";
-import AiNavigations from "./AiNavigations";
+
 import LoadingComp from "../../../utils/ReusedComp/LoadingComp";
 import {
 	UseAppDispach,
 	useAppSelector,
 } from "../../../utils/stateManagement/store";
-import { AiWebsiteAgeSearch } from "../../../utils/APICalls";
-import { ageData } from "../../../utils/stateManagement/authState";
+import { KeywordFast } from "../../../utils/APICalls";
 import EmptyData from "../../../utils/ReusedComp/EmptyData";
 import pic from "../images/5.svg";
+import KeyHead from "./KeyHead";
+import { FastData } from "../../../utils/stateManagement/authState";
 
-const AiWebsiteAge = () => {
+const TableContainer = styled.div`
+	overflow-x: auto;
+`;
+
+const Table = styled.table`
+	width: 100%;
+	border-collapse: collapse;
+	background-color: white;
+	overflow-x: scroll;
+
+	tbody > tr:nth-child(odd) {
+		background-color: #fafafc;
+	}
+`;
+
+const Th = styled.th`
+	padding: 8px;
+	text-align: left;
+	border-bottom: 1px solid #ddd;
+	border-right: 1px solid #ddd;
+`;
+
+const Td = styled.td`
+	padding: 8px;
+	text-align: left;
+	border-right: 1px solid #ddd;
+	white-space: pre-wrap;
+	word-wrap: break-word;
+
+	&:last-child {
+		border-right: none;
+	}
+`;
+
+const KeyWordFast = () => {
 	const [keyword, setKeyword] = useState<string>("");
 	const [load, setLoad] = useState<boolean>(false);
 	const user = useAppSelector((state) => state.currentUser);
-	const readData = useAppSelector((state) => state.age);
+	const readFast = useAppSelector((state) => state.fast);
 	const dispatch = UseAppDispach();
-	const SearchWordNow = async () => {
+	const SearchKeywordResearchNow = async () => {
 		setLoad(true);
-		await AiWebsiteAgeSearch(keyword, user?.data?._id, user?.token).then(
+		await KeywordFast(keyword, user?.data?._id, user?.token).then(
 			async (response: any) => {
 				setLoad(false);
-				console.log(response);
-				dispatch(ageData(response?.data));
+				// console.log(response);
+				dispatch(FastData(response?.data));
 			},
 		);
 	};
@@ -31,29 +66,31 @@ const AiWebsiteAge = () => {
 
 	return (
 		<Container>
-			<AiNavigations />
+			<KeyHead />
 			<Wrapper>
 				<Main
 					onSubmit={(e) => {
 						e.preventDefault();
-						SearchWordNow();
+						SearchKeywordResearchNow();
 					}}>
-					<InputText>Search Keyword</InputText>
+					<InputText>Keyword</InputText>
 					<Input2>
 						<Input3
+							required
 							onChange={(e) => {
 								setKeyword(e.target.value);
 							}}
-							// value={googleKeywords}
-							required={true}
-							placeholder='e.g https://searchengineland.com'
-							type='url'
+							placeholder='eg. SEO Tool'
+							type='search'
 						/>
-						<Button>Search</Button>
+
+						<Button>Analyze</Button>
 					</Input2>
 				</Main>
-
-				{Object.keys(readData).length === 0 && (
+				<br />
+				<br />
+				<br />
+				{Object.keys(readFast).length === 0 && (
 					<div>
 						{" "}
 						<EmptyData
@@ -62,7 +99,8 @@ const AiWebsiteAge = () => {
 						/>
 					</div>
 				)}
-				{readData?.status === "error" && (
+
+				{readFast?.status === "error" && (
 					<div>
 						<EmptyData
 							avatar={pic}
@@ -71,73 +109,47 @@ const AiWebsiteAge = () => {
 					</div>
 				)}
 
-				<br />
-				<br />
-
-				{readData?.status === "ok" && (
-					<MiddleBox>
-						<InnerMidBox bb='1px solid red'>
-							<InnerTitle>URL age (Years)</InnerTitle>
-							<InnerSub>
-								{readData?.data?.data &&
-									readData?.data?.data[0]["URL age (Years)"]}
-							</InnerSub>
-						</InnerMidBox>
-						<InnerMidBox bb='1px solid green'>
-							<InnerTitle>Website age (Years)</InnerTitle>
-							<InnerSub>
-								{readData?.data?.data &&
-									readData?.data?.data[0]["Website age (Years)"]}
-							</InnerSub>
-						</InnerMidBox>
-						<InnerMidBox bb='1px solid yellow'>
-							<InnerTitle>Website first seen</InnerTitle>
-							<InnerSub>
-								{readData?.data?.data &&
-									readData?.data?.data[0]["Website first seen"]}
-							</InnerSub>
-						</InnerMidBox>
-						<InnerMidBox bb='1px solid blue'>
-							<InnerTitle>URL first seen</InnerTitle>
-							<InnerSub>
-								{readData?.data?.data &&
-									readData?.data?.data[0]["URL first seen"]}
-							</InnerSub>
-						</InnerMidBox>
-					</MiddleBox>
+				{readFast?.status === "ok" && (
+					<div>
+						<TableTitle>
+							<span>Keyword Suggestion (Fast)</span>
+						</TableTitle>
+						<TableContainer>
+							<Table>
+								<thead>
+									<tr>
+										<Th>#</Th>
+										<Th>Keyword</Th>
+										<Th>Keyword Type</Th>
+										<Th>Relevancy</Th>
+										<Th>Keyword source</Th>
+										<Th>Keyword base</Th>
+										<Th>Keyword matches</Th>
+									</tr>
+								</thead>
+								<tbody>
+									{readFast?.data?.data?.map((item: any, index: any) => (
+										<tr key={index}>
+											<Td></Td>
+											<Td>{item?.Keyword}</Td>
+											<Td>{item["Keyword type"]}</Td>
+											<Td>{item?.Relevancy}</Td>
+											<Td>{item["Keyword source"]}</Td>
+											<Td>{item["Keyword base"]}</Td>
+											<Td>{item["Keyword matches"]}</Td>
+										</tr>
+									))}
+								</tbody>
+							</Table>
+						</TableContainer>
+					</div>
 				)}
-
-				<br />
-				<br />
 			</Wrapper>
 		</Container>
 	);
 };
 
-export default AiWebsiteAge;
-
-const MiddleBox = styled.div`
-	display: flex;
-	flex-wrap: wrap;
-`;
-const InnerMidBox = styled.div<{ bb: string }>`
-	height: 90px;
-	width: 210px;
-	background-color: #fff;
-	margin: 10px;
-	padding: 10px;
-	border-bottom: ${(props) => props.bb};
-`;
-
-const InnerTitle = styled.div`
-	font-size: 13px;
-	font-weight: 600;
-	margin-bottom: 30px;
-`;
-const InnerSub = styled.div`
-	font-size: 25px;
-	font-weight: 800;
-`;
+export default KeyWordFast;
 
 const TableTitle = styled.div`
 	width: 100%;
@@ -156,6 +168,13 @@ const TableTitle = styled.div`
 	}
 `;
 
+const InputText = styled.div`
+	font-size: 12px;
+	margin-bottom: 3px;
+	font-weight: 600;
+	/* font-weight: 600; */
+`;
+
 const Input3 = styled.input`
 	flex: 1;
 	padding-left: 10px;
@@ -163,6 +182,12 @@ const Input3 = styled.input`
 	outline: none;
 	border: none;
 	font-family: Montserrat;
+`;
+
+const Main = styled.form`
+	width: 100%;
+	margin-top: 10px;
+	margin-right: 40px;
 `;
 const Input2 = styled.div`
 	height: 35px;
@@ -196,23 +221,10 @@ const Button = styled.button`
 	}
 `;
 
-const Main = styled.form`
-	width: 100%;
-	margin-top: 10px;
-	margin-right: 40px;
-`;
-
-const InputText = styled.div`
-	font-size: 12px;
-	margin-bottom: 3px;
-	font-weight: 600;
-	/* font-weight: 600; */
-`;
-
 const Wrapper = styled.div`
-	margin-left: 30px;
-	margin-top: 30px;
-	width: 95%;
+	margin-left: 25px;
+	margin-top: 10px;
+	/* width : 98% */
 `;
 
 const Container = styled.div`

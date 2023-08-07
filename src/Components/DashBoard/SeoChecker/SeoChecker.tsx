@@ -1,92 +1,180 @@
-import React from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
 import EmptyData from "../../../utils/ReusedComp/EmptyData";
 import pic from "../images/5.svg";
-import KeyWordIdeaTable from "./KeyWordIdeaTable";
 import ResultTable from "./ResultTable";
 import KeyWordTable from "./KeyWordIdeaTable";
+import LocData from "../../../utils/ReusedComp/Locations.json";
+import LangData from "../../../utils/ReusedComp/Languages.json";
+import { SeoSearchAnalyzer, SeoSearchRanking } from "../../../utils/APICalls";
+import {
+	UseAppDispach,
+	useAppSelector,
+} from "../../../utils/stateManagement/store";
+import LoadingComp from "../../../utils/ReusedComp/LoadingComp";
+import { SeoSearchData } from "../../../utils/stateManagement/authState";
 
 const SeoChecker: React.FC = () => {
+	const [location, setLocation] = useState<string>("United States");
+	const [language, setLanguage] = useState<string>("English");
+	const [keyword, setKeyword] = useState<string>("");
+	const [load, setLoad] = useState<boolean>(false);
+	const user = useAppSelector((state) => state.currentUser);
+	const readDataSeo = useAppSelector((state) => state.seoData);
+	const dispatch = UseAppDispach();
+
+	console.log("rw", Object.keys(readDataSeo).length === 0);
+
+	const SearchNow = async () => {
+		setLoad(true);
+		await SeoSearchRanking(
+			keyword,
+			user?.data?._id,
+			language,
+			location,
+			user?.token,
+		).then(async (response1: any) => {
+			await SeoSearchAnalyzer(keyword, user?.data?._id, user?.token).then(
+				(response2: any) => {
+					console.log({
+						ranking: response1?.data?.data,
+						analyzer: response2?.data?.data,
+					});
+
+					dispatch(
+						SeoSearchData({
+							ranking: response1?.data?.data,
+							analyzer: response2?.data?.data,
+						}),
+					);
+
+					setLoad(false);
+				},
+			);
+		});
+	};
+
+	if (load) return <LoadingComp />;
+
 	return (
 		<Container>
 			<Wrapper>
 				<Title>Seo Checker</Title>
 				<Span>Find the most profitable keywords to rank for</Span>
 
-				<InputHold>
+				<form
+					onSubmit={(e) => {
+						e.preventDefault();
+						SearchNow();
+					}}
+					
+					>
+					<InputHold>
+						<Main>
+							<InputText> Select Language</InputText>
+							<Select
+								required
+								onChange={(e) => {
+									setLanguage(e.target.value);
+								}}>
+								{LangData?.map((languages, i: number) => (
+									<option key={i} value={languages.value}>
+										{languages.name}
+									</option>
+								))}
+							</Select>
+						</Main>
+						<Main>
+							<InputText>Select Location</InputText>
+							<Select
+								required
+								onChange={(e) => {
+									setLocation(e.target.value);
+								}}>
+								{LocData?.map((locations, i: number) => (
+									<option key={i} value={locations.value}>
+										{locations.name}
+									</option>
+								))}
+							</Select>
+						</Main>
+					</InputHold>
 					<Main>
 						<InputText>Search Engine Types</InputText>
-						<Select>
-							<option value='Google'>Google</option>
-							<option value='Bing'>Bing</option>
-							<option value='Yahoo'>Yahoo</option>
-							<option value='Baidu'>Baidu</option>
-							<option value='Naver'>Naver</option>
-							<option value='Seznam'>Seznam</option>
-							<option disabled value='Youtube'>
-								Youtube
-							</option>
-						</Select>
-					</Main>
-					<Main>
-						<InputText>Search Engine Track</InputText>
-						<Select>
-							<option value='Organic'>Organic</option>
-						</Select>
-					</Main>
-				</InputHold>
 
-				<Main>
-					<InputText>Search Engine Types</InputText>
-					<Input2>
-						<Input3
-							// value={googleKeywords}
-							required={true}
-							placeholder='Enter search'
-							type='search'
-						/>
-
-						<Button onClick={() => {}}>Analyze</Button>
-					</Input2>
-				</Main>
+						<Input2>
+							<Input3
+								onChange={(e) => {
+									setKeyword(e.target.value);
+								}}
+								// value={googleKeywords}
+								required
+								placeholder='Enter search'
+								type='search'
+							/>
+							<Button type='submit'>Analyze</Button>
+						</Input2>
+					</Main>
+				</form>
 
 				<hr />
-
 				<DownData>
-					<EmptyData avatar={pic} message='No result found' />
+					{load ? (
+						<>loading</>
+					) : (
+						<>
+							{Object.keys(readDataSeo).length === 0 ? (
+								<>
+									<EmptyData avatar={pic} message='No result found' />
+								</>
+							) : (
+								<>
+									{readDataSeo?.analyzer && (
+										<CardHold>
+											<Card>
+												<TitleCard>Tool Name</TitleCard>
+												<Count>SERP analyzer</Count>
+											</Card>
+											<Card>
+												<TitleCard>Keyword</TitleCard>
+												<Count>{readDataSeo?.analyzer?.keyword}</Count>
+											</Card>
+											<Card>
+												<TitleCard>Country Code</TitleCard>
+												<Count>{readDataSeo?.analyzer?.country}</Count>
+											</Card>
+											<Card>
+												<TitleCard>Language</TitleCard>
+												<Count>{readDataSeo?.analyzer?.language}</Count>
+											</Card>
+										</CardHold>
+									)}
 
-					<CardHold>
-						<Card>
-							<TitleCard>Keyword</TitleCard>
-							<Count>hfgnm,fm</Count>
-						</Card>
-						<Card>
-							<TitleCard>Location Code</TitleCard>
-							<Count>dfgjkflg</Count>
-						</Card>
-						<Card>
-							<TitleCard>Item Count</TitleCard>
-							<Count>sfhnmg,</Count>
-						</Card>
-						<Card>
-							<TitleCard>Se_Result Count</TitleCard>
-							<Count>hfjkl</Count>
-						</Card>
-					</CardHold>
+									{readDataSeo?.ranking?.data?.length >= 1 && (
+										<>
+											<TableTitle>
+												<span>Rank Checker </span>
+											</TableTitle>
+											<ResultTable data={readDataSeo?.ranking?.data} />
+										</>
+									)}
 
-					<TableTitle>
-						<span>Organic Keywords </span>
-					</TableTitle>
-					<ResultTable />
-					<br/>
-					<br/>
-
-					<TableTitle>
-						<span>SERP Analyzer Data </span>
-					</TableTitle>
-					<KeyWordTable />
-
-				
+									<br />
+									<br />
+									{Object.keys(readDataSeo?.analyzer?.data)?.length >=1 && (
+										<>
+											<TableTitle>
+												<span>Analyzer </span>
+											</TableTitle>
+											<KeyWordTable
+												data={Object.entries(readDataSeo?.analyzer?.data)}
+											/>
+										</>
+									)}
+								</>
+							)}
+						</>
+					)}
 				</DownData>
 			</Wrapper>
 		</Container>
@@ -173,7 +261,6 @@ const InputText = styled.div`
 	font-weight: 600;
 	/* font-weight: 600; */
 `;
-
 
 const TableTitle = styled.div`
 	width: 100%;
